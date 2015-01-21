@@ -9,10 +9,10 @@
 Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
 =Controller=
-* [ChickenTenderController]
+* [ChickenTenderController Controller]
 =Auto Door=
 
-* [AutoDoor] 
+* [AutoDoor Auto Door] 
 
 =Sensors=
 
@@ -24,8 +24,8 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 
 =Food Bucket=
 
-* [FoodBucket]
+* [FoodBucket Food Bucket]
 
 =Water Bucket=
 
-* [WaterBucket]
+* [WaterBucket Water Bucket]
