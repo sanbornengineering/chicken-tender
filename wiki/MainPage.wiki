@@ -1,7 +1,7 @@
 #summary Welcome to the main page.
 #labels Featured
 
-=Table of Contents=
+*Table of Contents*
 <wiki:toc max_depth="7" />
 
 = Introduction =
@@ -29,4 +29,3 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 =Water Bucket=
 
 * [WaterBucket]
-
