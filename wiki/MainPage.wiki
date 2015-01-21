@@ -6,7 +6,10 @@
 Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
 
-= Contents =
+= Table of Contents =
+
+<wiki:toc max_depth="1" />
+
 
 ===ChickenTender===
 
