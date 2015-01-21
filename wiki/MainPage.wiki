@@ -9,21 +9,27 @@
 Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
 =Controller=
+under construction
 * [ChickenTenderController Controller]
-=Auto Door=
 
+=Auto Door=
+under construction
 * [AutoDoor Auto Door] 
 
 =Sensors=
-
+under construction
 * [Sensors]
 
-=Live=
+Keep track of your chickens water, food, grit and calcium to alert you when they are running low. 
 
+=Live=
+under construction
 * [LIVE]
 
-=Food Bucket=
+System to view your chickens living conditions online view a computer or smart phone
 
+=Food Bucket=
+under construction
 * [FoodBucket Food Bucket]
 
 =Water Bucket=
