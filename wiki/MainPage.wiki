@@ -8,9 +8,9 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 
 = Contents =
 
-WikiWordLink
-[Project home]
-https://code.google.com/p/chicken-tender
+===Home Page===
+[https://code.google.com/p/chicken-tender]
+
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
