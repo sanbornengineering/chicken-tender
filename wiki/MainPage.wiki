@@ -3,10 +3,14 @@
 
 = Introduction =
 
-Add your content here.
+Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
 
-= Details =
+= Contents =
+
+
+[Project home]
+https://code.google.com/p/chicken-tender
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
