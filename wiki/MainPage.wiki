@@ -8,8 +8,13 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 
 = Contents =
 
-===Master Controller===
-[ChickenTenderController]
+===ChickenTender===
+*[ChickenTenderController]
+*[AutoDoor]
+*[Sensors]
+*[FoodBucket]
+*[WaterBucket]
+
 
 
 Add your content here.  Format your content with:
