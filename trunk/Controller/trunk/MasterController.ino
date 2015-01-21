@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Project: Chicken Tender		                                        */
 /* Program: MasterController                                            */
 /* Version: 1.0                                                         */
-/* Date: 10/09/2014                                                     */
+/* Date: 01/20/2015                                                    */
 /* Company: Sanborn Engineering                                         */
 /* Author: James Sanborn                                                */
 /* Description: see latest date ProductDescriptionMasterController.odt  */
