@@ -1,20 +1,19 @@
 #summary Welcome to the main page.
 #labels Featured
 
+<wiki:toc max_depth="7" />
+
 = Introduction =
 
 Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
-
-= Table of Contents =
-
-<wiki:toc max_depth="7" />
 ==Controller==
 ==Auto Door==
 ==Sensors==
 ==Live==
 ==Food Bucket==
 ==Water Bucket==
+
 
 
 * [ChickenTenderController]
