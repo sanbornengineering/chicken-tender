@@ -8,8 +8,8 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 
 = Contents =
 
-===Home Page===
-[https://code.google.com/p/chicken-tender]
+===Master Controller===
+[ChickenTenderController]
 
 
 Add your content here.  Format your content with:
