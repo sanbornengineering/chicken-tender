@@ -9,7 +9,6 @@ Welcome to our wiki page. We will be posting lots of information here. You can f
 = Table of Contents =
 
 <wiki:toc max_depth="7" />
-=ChickenTender=
 ==Controller==
 ==Auto Door==
 ==Sensors==
