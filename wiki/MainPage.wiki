@@ -8,28 +8,25 @@
 
 Welcome to our wiki page. We will be posting lots of information here. You can find all the user manuals and links to videos, instructions to build parts of the chicken coop, lessons learnt, maintenance and repair.
 
-==Controller==
-==Auto Door==
-==Sensors==
-==Live==
-==Food Bucket==
-==Water Bucket==
-
-
-
+=Controller=
 * [ChickenTenderController]
+=Auto Door=
 
 * [AutoDoor] 
 
+=Sensors=
+
 * [Sensors]
+
+=Live=
+
+* [LIVE]
+
+=Food Bucket=
 
 * [FoodBucket]
 
+=Water Bucket=
+
 * [WaterBucket]
 
-
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
