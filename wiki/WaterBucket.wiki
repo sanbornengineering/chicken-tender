@@ -9,7 +9,7 @@ The convenient way to keep your chickens hydrated and happy.
 Why not just use one of the standard waters bought at the local farm store.
 Chickens are dirty, busy, and rambunctious animals. 
 
-==Lessons learnt==
+==Lessons learned==
 
 We wanted to have a care free clean water for our chickens. First we tried the store bought upside down mason jar style. Everyday the chickens either knocked it over, put wood chips in it or pooped in their water. Not a good solution. Next we tried a gravity fed water nipple system. This worked OK but was impossible to clean. The best solution turned out to be a horizontal spring loaded nipples that mount directly in the side of a 5 gallon bucket. 
 
@@ -35,7 +35,7 @@ This was becoming to much work for our low maintenance chickens. We tried a 25 w
 == Heater Installation Instructions ==
 
  # Drill a pilot hole in the side of the bucket near the top. 
- # Step up to a 1/2 inch hole.
+ # Step up to a 1/2 inch hole. https://drive.google.com/file/d/0BwKs3fOek0BDS2V3NXdMM0R2MHM/view?usp=sharing?chs=200x125&chd=t:48.14,33.79,19.77|83.18,18.73,12.04&cht=bvg&nonsense=something_that_ends_with.png
  # Using a saw cut from the top of the bucket to the top of the 1/2" drilled hole.
  # Work the grommet over the electrical cord of the heater
  # Push the grommet into the 1/2" hole to seal out dirt and grime
