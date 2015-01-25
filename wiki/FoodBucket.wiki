@@ -2,10 +2,32 @@
 
 = Food Bucket =
 
-Add your content here.
+We tried the store bought bird feeders but found they are prone to spillage and getting tipped over. 
 
 
-= Details =
+= Modified Mason Jar Feeder = 
+
+We found the mason jar style feeder got tipped over to often and caused a lot of spillage from our chicks. So we created a new version to reduce the spillage and increase the capacity. 
+
+== Parts List == 
+
+ # Metal mason jar feeder
+ # 2 inch to 1 inch PVC coupling
+ # 2 foot piece of 1 inch PVC
+ # 2 foot piece of 2 inch PVC
+ # 2 inch to drain adapter
+ # 5 gallon or similar buck with top. 
+
+= Instructions =
+
+ # Cut two pieces of the 1 inch PVC. 
+  # 1.5 inch piece for crumbles
+  # 1 inch piece for pellets
+ # File off edges of coupling and press into metal feeder
+ # Drill two pilot holes in metal and coupling for two screws
+ # Press 2 inch PVC into coupling and screw in place
+
+
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
