@@ -27,9 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Description: see latest date ProductDescriptionMasterController.odt  */
 /* Description: see latest date ProductDescriptionMasterController.odt  */
 /************************************************************************/ 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "ChickenTender/ChickenTender.h"
-#include "EEPROM/EEPROM.h"
+#include <EEPROMEx/EEPROMex.h>
 #include "avr/pgmspace.h"
 #include "Wire/Wire.h"
 #include "LiquidCrystal_I2C.h"
@@ -50,64 +50,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define sensorInterval 6000 // check sensors ever 10 minutes
 #define alarmInterval 60000 // check alarms ever 1 minute
 
-// state IDs for main loop
-/*
-#define displayID 0
-#define sleepModeID 1
-#define userMenuID 2
-#define openDoorID 3
-#define closeDoorID 4
-*/
+
 
 // Global variables
-const uint8_t displayID = 0;
-const uint8_t sleepModeID = 1;
-const uint8_t userMenuID = 2;
-const uint8_t openDoorID = 3;
-const uint8_t closeDoorID = 4;
-uint8_t stateID = displayID;
+const uint8_t displayID_u8 = 0;
+const uint8_t sleepModeID_u8 = 1;
+const uint8_t userMenuID_u8 = 2;
+const uint8_t openDoorID_u8 = 3;
+const uint8_t closeDoorID_u8 = 4;
+uint8_t stateID = displayID_u8;
 
 // IDs used for user display
 
-/*
-#define doNothingkDisplayID 0
-#define clockDisplayID 1
-#define alarmDisplayID 2
-#define foodDisplayID 3
-#define gritDisplayID 4
-#define calciumDisplayID 5
-#define waterDisplayID 6
-#define environmentDisplayID 7
-*/
 
-const uint8_t doNothingkDisplayID = 0;
-const uint8_t clockDisplayID = 1;
-const uint8_t alarmDisplayID = 2;
-const uint8_t foodDisplayID = 3;
-const uint8_t gritDisplayID = 4;
-const uint8_t calciumDisplayID = 5;
-const uint8_t waterDisplayID = 6;
-const uint8_t environmentDisplayID = 7;
+const uint8_t doNothingkDisplayID_u8 = 0;
+const uint8_t clockDisplayID_u8 = 1;
+const uint8_t alarmDisplayID_u8 = 2;
+const uint8_t foodDisplayID_u8 = 3;
+const uint8_t gritDisplayID_u8 = 4;
+const uint8_t calciumDisplayID_u8 = 5;
+const uint8_t waterDisplayID_u8 = 6;
+const uint8_t environmentDisplayID_u8 = 7;
 
 
-uint8_t userDisplayID=clockDisplayID;
+uint8_t userDisplayID=clockDisplayID_u8;
 unsigned long displayRefreshRate = 1000; 
-uint8_t displayChangeRate = 3;				// time that the display will switch between screens time = displayRefreshRate*displayChangeRate
+uint8_t displayChangeRate_u8 = 3;				// time that the display will switch between screens time = displayRefreshRate*displayChangeRate
 
 //////////////////////////////////////////////////////////////////////////
-unsigned long gotoSleepTimer=0;
-uint8_t sleepInterval = 10; //go to sleep after interval. In minutes
-unsigned int checkAlarmsCounter = 0;
-unsigned int checkAlarmsSleepInterval = 120;	// Every minute
-unsigned int checkSensorCounter = 0;
-unsigned int checkSensorsSleepInterval = 1200;	// Every 10 minutes
-unsigned int displayInterval = 6000; // check switch displays every 10 seconds this will be selectable later
-uint8_t displayTimerInterval=10; // switch from user menu to user display after time. In minutes  
+unsigned long gotoSleepTimer=0;		// where is this used?
+uint8_t sleepInterval_u8 = 10; //go to sleep after interval. In minutes
+unsigned int checkAlarmsCounter_u16 = 0;
+unsigned int checkAlarmsSleepInterval_u16 = 120;	// Every minute
+unsigned int checkSensorCounter_u16 = 0;
+unsigned int checkSensorsSleepInterval_u16 = 1200;	// Every 10 minutes
+unsigned int displayInterval_u16 = 6000; // check switch displays every 10 seconds this will be selectable later
+uint8_t displayTimerInterval_u8=10; // switch from user menu to user display after time. In minutes  
 // user buttons
-const uint8_t uiKeySelectPin = 2;
-const uint8_t uiKeyNextPin = 4;
-const uint8_t uiKeyDataUpPin = 7;
-const uint8_t uiKeyDataDownPin = 8;
+const uint8_t uiKeySelectPin_U8 = 2;
+const uint8_t uiKeyNextPin_u8 = 4;
+const uint8_t uiKeyDataUpPin_u8 = 7;
+const uint8_t uiKeyDataDownPin_u8 = 8;
 
 ChickenTender CT;			// create instance of chicken tender library. This should only by created once.
 
@@ -119,7 +102,7 @@ ChickenTender CT;			// create instance of chicken tender library. This should on
 // set the LCD address to 0x3f for a 20 chars and 4 line display
 LiquidCrystal_I2C lcd(0x3f, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE); 
 
-uint8_t lcdPowerPin = 52; 
+uint8_t lcdPowerPin_u8 = 52; 
 
 
 // Variables used in the Main menu
@@ -164,7 +147,7 @@ uint8_t timeClose_minute_temp = 0;
 uint8_t timeClose_hour_temp = 8;
 
 // variables used in the food menu
-uint32_t foodLevel = 10;			//Delete later food level in cm for current food level this should come from main program.
+uint8_t foodLevel = 10;			//Delete later food level in cm for current food level this should come from main program.
 uint8_t foodLevelMin = 20;		// Food level in cm when feeder is empty
 uint8_t foodLevelMax = 2;		// Food level in cm when feeder is full
 uint8_t foodLevelYesterday = 4; // food level in cm stored each day at night alarm time. 
@@ -180,27 +163,79 @@ uint8_t calciumLevelMin = 20;		// Calcium level in cm when feeder is empty
 uint8_t calciumLevelMax = 2;		// Calcium level in cm when feeder is full
 
 // variables used in the water menu
-uint8_t waterLevel = 5;			// Water level in cm for current water level this shall come from main program.
-uint8_t waterLevelMin = 30;		// Water level in cm when feeder is empty
-uint8_t waterLevelMax = 2;		// Water level in cm when feeder is full
+uint8_t waterLevel_u8 = 5;			// Water level in cm for current water level this shall come from main program.
+uint8_t waterLevelMin_u8 = 30;		// Water level in cm when feeder is empty
+uint8_t waterLevelMax_u8 = 2;		// Water level in cm when feeder is full
+
 
 // Variables used in the temperature menu
-uint8_t el_strlist_temperatureMenu_first = 0;
-uint8_t el_strlist_temperatureMenu_cnt = 6;
-float temperature = 23;
-int8_t temperatureMin = -40;
-int8_t temperatureMax = 127;
-int8_t temperatureOffset = 0;
-int8_t temperatureOffsetMin = -100;
-int8_t temperatureOffsetMax = 100;
-int8_t lowTemperatureAlarmValue = 0;
-int8_t lowTemperatureAlarmMin = -40;
-int8_t lowTemperatureAlarmMax = 98;
-uint8_t highTemperatureAlarmValue = 85;
-uint8_t highTemperatureAlarmMin = 0;
-uint8_t highTemperatureAlarmMax = 120;
-uint8_t humidityOffset = 0;
-const char *temperatureUnits = "Units = *F";
+uint8_t el_strlist_temperatureMenu_first_u8 = 0;
+uint8_t el_strlist_temperatureMenu_cnt_u8 = 6;
+float temperature_flt = 23;
+int8_t temperatureMin_s8 = -40;
+int8_t temperatureMax_s8 = 127;
+int8_t temperatureOffset_s8 = 0;
+int8_t temperatureOffsetMin_s8 = -100;
+int8_t temperatureOffsetMax_s8 = 100;
+int8_t lowTemperatureAlarmValue_s8 = 0;
+int8_t lowTemperatureAlarmMin_s8 = -40;
+int8_t lowTemperatureAlarmMax_s8 = 98;
+uint8_t highTemperatureAlarmValue_u8 = 85;
+uint8_t highTemperatureAlarmMin_u8 = 0;
+uint8_t highTemperatureAlarmMax_u8 = 120;
+uint8_t humidityOffset_u8 = 0;
+uint8_t temperatureUnits = 0; // 0 = Celsius, 1 = Fahrenheit
+
+
+// EEPROM support values
+
+const int maxAllowedWrites = 1000;
+const int memBase          = 350;
+const uint8_t firstTime = 0xAB;	// check flag for EEPROM data
+
+uint8_t userSetting_u8[] = {firstTime, timeOpen_hour, timeOpen_minute, timeClose_hour, timeClose_minute, 
+							sleepInterval_u8, displayInterval_u16, displayTimerInterval_u8, foodLevelMin, foodLevelMax,
+							gritLevelMin, gritLevelMax, calciumLevelMin, calciumLevelMax, waterLevelMin_u8,
+							waterLevelMax_u8, highTemperatureAlarmValue_u8, highTemperatureAlarmMin_u8, 
+							highTemperatureAlarmMax_u8, humidityOffset_u8, temperatureUnits};
+							
+					
+uint8_t userSetting_s8[] = {temperatureMin_s8, temperatureMax_s8, temperatureOffset_s8, temperatureOffsetMin_s8, 
+							temperatureOffsetMax_s8, lowTemperatureAlarmValue_s8, lowTemperatureAlarmMin_s8,
+							lowTemperatureAlarmMax_s8};
+
+
+// EEPROM memory map address
+
+int addressFirstTime;
+int addressTimeOpen_hour;
+int addressTimeOpen_minute;
+int addressTimeClose_hour;
+int addressTimeClose_minute;
+int addressSleepInterval;
+int addressDisplayInterval;
+int addressDisplayTimerInterval;
+int addressFoodLevelMin;
+int addressFoodLevelMax;
+int addressGritLevelMin;
+int addressGritLevelMax;
+int addressCalciumLevelMin;
+int addressCalciumLevelMax;
+int addressWaterLevelMin;
+int addressWaterLevelMax;
+int addressTemperatureMin;
+int addressTemperatureMax;
+int addressTemperatureOffset;
+int addressTemperatureOffsetMin;
+int addressTemperatureOffsetMax;
+int addressLowTemperatureAlarmValue;
+int addressLowTemperatureAlarmMin;
+int addressLowTemperatureAlarmMax;
+int addressHighTemperatureAlarmValue;
+int addressHighTemperatureAlarmMin;
+int addressHighTemperatureAlarmMax;
+int addressHumidityOffset;
+int addressTemperatureUnits;
 
 //*********************
 // Displays - Prototypes
@@ -305,19 +340,7 @@ M2tk m2(&vlist_sanbornEngineering_toplevel, m2_es_arduino, m2_eh_6bs, m2_gh_nlc)
 
 
 
-// EEPROM memory map
-/*
-const byte firstTime = 0xAA;	// check flag for EEPROM data
 
-const byte *eepromAddress[]PROGMEM = {
-&firstTime, &timeOpen_hour, &timeOpen_minute, &timeClose_hour, &timeClose_minute, &sleepInterval, 
-&displayInterval, &displayTimerInterval, &foodLevelMin, &foodLevelMax, &gritLevelMin, &gritLevelMax, 
-&calciumLevelMin, &calciumLevelMax, &waterLevelMin, &waterLevelMax, &temperatureMin, &temperatureMax, 
-&temperatureOffset,&temperatureOffsetMin, &temperatureOffsetMax, &lowTemperatureAlarmValue, 
-&lowTemperatureAlarmMin, &lowTemperatureAlarmMax, &highTemperatureAlarmValue, &highTemperatureAlarmMin, 
-&highTemperatureAlarmMax, &humidityOffset, &temperatureUnits
-};
-*/
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -333,16 +356,16 @@ void setup() {
 	Serial.println("--------------------------------");
 	
 	CT.setupRTC();	
-	pinMode(lcdPowerPin, OUTPUT);
-	digitalWrite(lcdPowerPin, true);	// turn on LCD screen
+	pinMode(lcdPowerPin_u8, OUTPUT);
+	digitalWrite(lcdPowerPin_u8, true);	// turn on LCD screen
 	m2_SetNewLiquidCrystal(&lcd, 20, 4);	// define LCD and screen size
 	m2_Draw();								// place splash screen on LCD
 	CT.setupSensors();
-	CT.setupUserButtons(uiKeySelectPin, uiKeyNextPin, uiKeyDataUpPin, uiKeyDataDownPin);
-	m2.setPin(M2_KEY_SELECT, uiKeySelectPin); 
-	m2.setPin(M2_KEY_NEXT, uiKeyNextPin);
-	m2.setPin(M2_KEY_DATA_UP, uiKeyDataUpPin);
-	m2.setPin(M2_KEY_DATA_DOWN, uiKeyDataDownPin);
+	CT.setupUserButtons(uiKeySelectPin_U8, uiKeyNextPin_u8, uiKeyDataUpPin_u8, uiKeyDataDownPin_u8);
+	m2.setPin(M2_KEY_SELECT, uiKeySelectPin_U8); 
+	m2.setPin(M2_KEY_NEXT, uiKeyNextPin_u8);
+	m2.setPin(M2_KEY_DATA_UP, uiKeyDataUpPin_u8);
+	m2.setPin(M2_KEY_DATA_DOWN, uiKeyDataDownPin_u8);
 	//Alarm.alarmRepeat(timeOpen_hour,timeOpen_minute, timeOpen_second, openAlarm);
 	//Alarm.alarmRepeat(timeClose_hour,timeClose_minute, timeClose_second, closeAlarm);
 	CT.setupWirelessLink();
@@ -360,47 +383,47 @@ void loop() {
 	
 	switch (stateID)
 	{
-		case displayID:
+		case displayID_u8:
 			CT.blinkLED(true,blinkInterval);					// activate heartbeat LED					
 			displays(0); 								
 			// check to see if the user has pressed up or down button 
-			if(!CT.debounceButton(uiKeyDataUpPin))
+			if(!CT.debounceButton(uiKeyDataUpPin_u8))
 			{
-				while(!CT.debounceButton(uiKeyDataUpPin))
+				while(!CT.debounceButton(uiKeyDataUpPin_u8))
 				{
 					#ifdef _DEBUG
 						Serial.println("Up Button Pressed");	// Hold until button is released
 					#endif // _DEBUG
 				}
-				CT.sleepTimer(sleepInterval, true);		// reset sleep timer
+				CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 				displays(-1);
 				
 			}
-			if(!CT.debounceButton(uiKeyDataDownPin))
+			if(!CT.debounceButton(uiKeyDataDownPin_u8))
 			{
-				while(!CT.debounceButton(uiKeyDataDownPin))
+				while(!CT.debounceButton(uiKeyDataDownPin_u8))
 				{
 					#ifdef _DEBUG
 						Serial.println("Down Button Pressed");	// Hold until button is released
 					#endif // _DEBUG
 				}
-				CT.sleepTimer(sleepInterval, true);		// reset sleep timer
+				CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 				displays(1);			
 			}
 			// check to see if the user has pressed select or next button 
-			if(!CT.debounceButton(uiKeySelectPin)|| !CT.debounceButton(uiKeyNextPin))
+			if(!CT.debounceButton(uiKeySelectPin_U8)|| !CT.debounceButton(uiKeyNextPin_u8))
 			{
-				stateID = userMenuID;		// jump to user menu
-				CT.sleepTimer(sleepInterval, true);		// reset sleep timer
+				stateID = userMenuID_u8;		// jump to user menu
+				CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 				m2_SetRoot(&vlist_mainMenu_toplevel);
 				m2_Draw();
 			}		
 			else
 			{
 				Alarm.delay(0);		// check alarms
-				if(CT.sleepTimer(sleepInterval, false))
+				if(CT.sleepTimer(sleepInterval_u8, false))
 				{
-					stateID = sleepModeID;				
+					stateID = sleepModeID_u8;				
 					// turn off LCD
 									
 					#ifdef _DEBUG
@@ -411,7 +434,7 @@ void loop() {
 
 			break;	// end display ID mode
 	
-	case sleepModeID:
+	case sleepModeID_u8:
 			
 			
 			//implement a sleep flag to save time in the future
@@ -419,30 +442,30 @@ void loop() {
 			CT.blinkLED(false,blinkInterval); // Shut down heart beat LED
 			// turn off LCD
 			lcd.noDisplay();
-			digitalWrite(lcdPowerPin, LOW);		// turn off power to LCD screen
+			digitalWrite(lcdPowerPin_u8, LOW);		// turn off power to LCD screen
 			// check to see if the user has pressed up or down button 
-			if(!CT.debounceButton(uiKeyDataUpPin) ||!CT.debounceButton(uiKeyDataDownPin))
+			if(!CT.debounceButton(uiKeyDataUpPin_u8) ||!CT.debounceButton(uiKeyDataDownPin_u8))
 			{
-				digitalWrite(lcdPowerPin, HIGH);
-				CT.sleepTimer(sleepInterval, true);		// reset sleep timer
+				digitalWrite(lcdPowerPin_u8, HIGH);
+				CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 				// add delay?
 				lcd.display();							// Activate LCD
-				stateID = displayID;					// jump to user display state
+				stateID = displayID_u8;					// jump to user display state
 				#ifdef _DEBUG
 					Serial.println("Goto user display");
 				#endif // _DEBUG
 				
 			}
 			// check to see if the user has pressed select or next button 
-			else if (!CT.debounceButton(uiKeySelectPin)|| !CT.debounceButton(uiKeyNextPin))
+			else if (!CT.debounceButton(uiKeySelectPin_U8)|| !CT.debounceButton(uiKeyNextPin_u8))
 			{
-				digitalWrite(lcdPowerPin, HIGH);
+				digitalWrite(lcdPowerPin_u8, HIGH);
 				// add delay?
-				CT.sleepTimer(sleepInterval, true);			// reset sleep timer
+				CT.sleepTimer(sleepInterval_u8, true);			// reset sleep timer
 				lcd.display();								// Activate LCD
-				CT.displayTimer(displayTimerInterval,true); // reset display timer
+				CT.displayTimer(displayTimerInterval_u8,true); // reset display timer
 				m2_SetRoot(&vlist_mainMenu_toplevel);		// goto main menu
-				stateID = userMenuID;
+				stateID = userMenuID_u8;
 				#ifdef _DEBUG
 					Serial.println("Goto User Menus");				
 				#endif // _DEBUG
@@ -457,20 +480,20 @@ void loop() {
 			
 		break;	// end sleep mode
 		
-	case userMenuID:
+	case userMenuID_u8:
 			CT.blinkLED(true,blinkInterval);
-			CT.sleepTimer(sleepInterval, true);		// reset sleep timer
+			CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 			m2.checkKey();
 			m2.checkKey();
 			if ( m2.handleKey() )
 			{
 				m2.draw();
-				CT.displayTimer(displayTimerInterval, true);
+				CT.displayTimer(displayTimerInterval_u8, true);
 			}
 			m2.checkKey();
-			if(CT.displayTimer(displayTimerInterval, false))
+			if(CT.displayTimer(displayTimerInterval_u8, false))
 			{
-				stateID = displayID;
+				stateID = displayID_u8;
 				#ifdef _DEBUG
 					Serial.println("Go to user display");
 				#endif // _DEBUG
@@ -481,7 +504,7 @@ void loop() {
 		
 		
 		
-	case openDoorID:
+	case openDoorID_u8:
 
 		break;	// end user menu mode
 	
@@ -570,7 +593,7 @@ const char *el_strlist_mainMenu_getstr(uint8_t idx, uint8_t msg) {
           break; 
 		case 6:
 		  Serial.println("goto user displays menu");
-		  stateID=displayID;
+		  stateID=displayID_u8;
 		  break;
         default :
           Serial.print("no menu change was initiated");
@@ -796,7 +819,14 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
   const char *e = "";
   if  ( idx == 0 )
   {
-    e = temperatureUnits;
+	  if (1==temperatureUnits)
+	  {
+		  e = "Units = *F";
+	  }
+	  else
+	  {
+		   e = "Units = *C";
+	  }
   }
   else if ( idx == 1 )
   {
@@ -820,7 +850,14 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
   }
   else if ( idx > 5 )
   {
-    e = temperatureUnits;
+    if (1==temperatureUnits)
+    {
+	    e = "Units = *F";
+    }
+    else
+    {
+	    e = "Units = *C";
+    }
   }
   if (msg == M2_STRLIST_MSG_SELECT) 
   {
@@ -832,11 +869,16 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
       switch(idx) 
       {
         case 0:
-          if (temperatureUnits=="Units = *F")
-          temperatureUnits = "Units = *C";
+          if (1==temperatureUnits)
+          {
+			temperatureUnits = 0;
+			Serial.println("Units = *C");
+		  }
           else
-          temperatureUnits = "Units = *F";
-          Serial.println(temperatureUnits);
+		  {
+			 temperatureUnits = 1;
+			 Serial.println("Units = *F");
+		  }
           break;
         case 1:
           Serial.println("Temperature Adjust");
@@ -887,54 +929,54 @@ void displays(int8_t direction)
 	switch(userDisplayID)
 	{
 		
-		case doNothingkDisplayID:
+		case doNothingkDisplayID_u8:
 			break;
 						
-		case clockDisplayID:
+		case clockDisplayID_u8:
 			m2_SetRoot(&vlist_dateTimeDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
-		case alarmDisplayID:	
+		case alarmDisplayID_u8:	
 			m2_SetRoot(&vlist_alarmDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
-		case foodDisplayID:
+		case foodDisplayID_u8:
 			m2_SetRoot(&vlist_foodDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
-		case gritDisplayID:
+		case gritDisplayID_u8:
 			m2_SetRoot(&vlist_gritDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
-		case calciumDisplayID:
+		case calciumDisplayID_u8:
 			m2_SetRoot(&vlist_calciumDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
 				
-		case waterDisplayID:
+		case waterDisplayID_u8:
 			m2_SetRoot(&vlist_waterDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 				
-		case environmentDisplayID:
+		case environmentDisplayID_u8:
 			m2_SetRoot(&vlist_environmentDisplay_toplevel);
 			m2_Draw();
 			m2_HandleKey();
 			break;
 	}
 			
-	userDisplayID = CT.advanceDisplays(displayRefreshRate, displayChangeRate, environmentDisplayID, direction);
+	userDisplayID = CT.advanceDisplays(displayRefreshRate, displayChangeRate_u8, environmentDisplayID_u8, direction);
 	
 	#ifdef _DEBUG
 		if(0!=userDisplayID)
@@ -1024,7 +1066,7 @@ const char *ampmDisplay(m2_rom_void_p element)
 uint8_t foodLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t foodLevelPerc) {
 	
 	
-	float food = CT.foodSensor(temperature);
+	float food = CT.foodSensor(temperature_flt);
 	foodLevelPerc = map(food, foodLevelMin, foodLevelMax,1,99);
 	
 	#ifdef _DEBUG
@@ -1061,7 +1103,7 @@ uint8_t foodLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t foodLevel
 uint8_t gritLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevelPerc) {
 	
 	
-	float grit = CT.gritSensor(temperature);
+	float grit = CT.gritSensor(temperature_flt);
 	gritLevelPerc = map(grit, gritLevelMin, gritLevelMax,1,99);
 	#ifdef _DEBUG
 		Serial.print("Grit level = ");
@@ -1093,7 +1135,7 @@ uint8_t gritLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevel
 //////////////////////////////////////////////////////////////////////////
 uint8_t calciumLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t calciumLevelPerc) {
 	
-	float calcium = CT.calciumSensor(temperature);
+	float calcium = CT.calciumSensor(temperature_flt);
 	calciumLevelPerc = map(calcium, calciumLevelMin, calciumLevelMax,1,99);
 	#ifdef _DEBUG
 		Serial.print("Calcium level = ");
@@ -1124,7 +1166,7 @@ uint8_t calciumLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t calciu
 uint8_t waterLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t waterLevelPerc) {
 	
 	unsigned int water = 15;			// replace with sensor call function
-	waterLevelPerc = map(water, waterLevelMin, waterLevelMax,0,99);
+	waterLevelPerc = map(water, waterLevelMin_u8, waterLevelMax_u8,0,99);
 	return waterLevelPerc;
 	
 }
@@ -1133,7 +1175,7 @@ uint8_t waterLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t waterLevelPerc
 uint8_t waterLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t waterLevelYesterday) {
 	
 	
-	int8_t waterLevelChange = waterLevel - waterLevelYesterday;
+	int8_t waterLevelChange = waterLevel_u8 - waterLevelYesterday;
 	
 	return waterLevelChange;
 	
@@ -1153,7 +1195,7 @@ uint8_t getTemperature_fn(m2_rom_void_p element, uint8_t msg, uint8_t temp) {
 
 const char *tempUnits_fn(m2_rom_void_p element)
 {
-	if (temperatureUnits=="Units = *F")
+	if (1==temperatureUnits)
 	{
 		static const char f[] = "*F";
 		return f;
@@ -1197,27 +1239,6 @@ boolean lowTemperatureAlarm(int8_t actualTemperature, int8_t lowTemperatureThres
 	}
 	return lowTemperatureFlag;
 }
-
-
-
-/************************************************************************/
-/* EEPROM Memory location search                                        */
-/************************************************************************/
-
-unsigned int searchIndex(int value, byte lookUpTable[])
-{
-	for (unsigned int i=0; i < sizeof(lookUpTable); i++)
-	{
-		if (lookUpTable[i] == value)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
-
-
 
 
 //***********************
@@ -1358,7 +1379,7 @@ M2_VLIST(vlist_waterDisplay_toplevel, NULL, list_waterUserDisplay);
 // Environment display
 //*******************
 M2_LABEL(el_temperature_label, NULL,"Temperature Now");
-M2_S8NUMFN(el_temperatureValue_S8, "c2r1", temperatureMin,temperatureMax, getTemperature_fn);
+M2_S8NUMFN(el_temperatureValue_S8, "c2r1", temperatureMin_s8,temperatureMax_s8, getTemperature_fn);
 M2_LABELFN(el_tempUnits_label, NULL, tempUnits_fn); 
 M2_LIST(list_displaytemperatureValue) = {&el_temperatureValue_S8, &el_tempUnits_label};
 M2_HLIST(hlist_displaytemperatureValue, NULL, list_displaytemperatureValue);
@@ -1529,15 +1550,15 @@ M2_VLIST(Vlist_calciumMenu_toplevel, NULL, list_calciumMenu);
 //*******************
 
 //M2_LABEL(el_waterLevel_label, NULL,"H2O Level Now");
-M2_U8NUM(el_waterLevelValue_U8, "c2r1", 0, 99, &waterLevel);
+M2_U8NUM(el_waterLevelValue_U8, "c2r1", 0, 99, &waterLevel_u8);
 M2_LIST(list_waterLevel) = {&el_waterLevel_label, &el_waterLevelValue_U8, &el_percent_label};
 M2_HLIST(hlist_waterLevel, NULL, list_waterLevel);
 M2_LABEL(el_waterLevelMax_label, NULL,"Water Max");
-M2_U8NUM(el_waterLevelMax_U8, "c2", 0, 300, &waterLevelMax);
+M2_U8NUM(el_waterLevelMax_U8, "c2", 0, 300, &waterLevelMax_u8);
 M2_LIST(list_waterLevelMax) = {&el_waterLevelMax_label, &el_waterLevelMax_U8, &el_cm_label};
 M2_HLIST(hlist_waterLevelMax, NULL, list_waterLevelMax);
 M2_LABEL(el_waterLevelMin_label, NULL,"Water Min");
-M2_U8NUM(el_waterLevelMin_U8, "c2", 0, 300, &waterLevelMin);
+M2_U8NUM(el_waterLevelMin_U8, "c2", 0, 300, &waterLevelMin_u8);
 M2_LIST(list_waterLevelMin) = {&el_waterLevelMin_label, &el_waterLevelMin_U8, &el_cm_label};
 M2_HLIST(hlist_waterLevelMin, NULL, list_waterLevelMin);
 M2_LIST(list_waterMenu) = {&hlist_waterLevel, &hlist_waterLevelMin, &hlist_waterLevelMax, &el_mainMenuGoBack_button};
@@ -1548,8 +1569,8 @@ M2_VLIST(Vlist_waterMenu_toplevel, NULL, list_waterMenu);
 // Temperature menu setup
 //*******************
 M2_LABEL(el_title_temperatureMenu_label, NULL,"Temperature Menu");
-M2_STRLIST(el_strlist_temperatureMenu, "l3w15", &el_strlist_temperatureMenu_first, &el_strlist_temperatureMenu_cnt, el_strlist_temperatureMenu_getstr);
-M2_VSB(el_strlist_temperatureMenu_vsb, "l3w1", &el_strlist_temperatureMenu_first, &el_strlist_temperatureMenu_cnt);
+M2_STRLIST(el_strlist_temperatureMenu, "l3w15", &el_strlist_temperatureMenu_first_u8, &el_strlist_temperatureMenu_cnt_u8, el_strlist_temperatureMenu_getstr);
+M2_VSB(el_strlist_temperatureMenu_vsb, "l3w1", &el_strlist_temperatureMenu_first_u8, &el_strlist_temperatureMenu_cnt_u8);
 M2_LIST(list_strlist_temperatureMenu) = { &el_strlist_temperatureMenu_vsb , &el_strlist_temperatureMenu};
 M2_HLIST(el_strlist_temperatureMenu_hlist, NULL, list_strlist_temperatureMenu);
 M2_LIST(list_label_strlist_temperatureMenu) = {&el_title_temperatureMenu_label, &el_strlist_temperatureMenu_hlist};
@@ -1558,12 +1579,12 @@ M2_VLIST(vlist_temperatureMenu_toplevel, NULL, list_label_strlist_temperatureMen
 //"Calibrate temp";
 M2_LABEL(el_title_temperatureCalibrateMenu_label, NULL,"Temperature Adjust");
 M2_LABEL(el_actualTemperature_label, NULL, "Actual Temp =");
-M2_S8NUMFN(el_actualTemperatureNumber_label, "+c3r1", temperatureMin, temperatureMax, getTemperature_fn);
+M2_S8NUMFN(el_actualTemperatureNumber_label, "+c3r1", temperatureMin_s8, temperatureMax_s8, getTemperature_fn);
 //M2_S8NUM(el,fmt,min,max,number)
 M2_LIST(list_actualTemperature) = {&el_actualTemperature_label, &el_actualTemperatureNumber_label};
 M2_HLIST(hlist_actualTemperature, NULL, list_actualTemperature);
 M2_LABEL(el_temperatureOffset_label, NULL, "Temp Offset =");
-M2_S8NUM(el_temperatureOffset_S8NUM, "+c2", temperatureOffsetMin, temperatureOffsetMax, &temperatureOffset);
+M2_S8NUM(el_temperatureOffset_S8NUM, "+c2", temperatureOffsetMin_s8, temperatureOffsetMax_s8, &temperatureOffset_s8);
 M2_LIST(list_temperatureOffset) = {&el_temperatureOffset_label, &el_temperatureOffset_S8NUM};
 M2_HLIST(hlist_temperatureOffset, NULL, list_temperatureOffset);
 M2_LIST(list_calibrateTemperatureMenu) = {&el_title_temperatureCalibrateMenu_label, &hlist_actualTemperature, &hlist_temperatureOffset, &el_tempMenuGoBack_button};
@@ -1572,11 +1593,11 @@ M2_VLIST(vlist_calibrateTemperatureMenu_toplevel, NULL, list_calibrateTemperatur
 //"Temperature alarms";
 M2_LABEL(el_title_TemperatureAlarm_label, NULL,"Temperature Alarms");
 M2_LABEL(el_lowTemperatureAlarm_label, NULL , "Low Temp Alarm");
-M2_S8NUM(el_lowTemperatureAlarm_S8NUM,"+c2", -40, 98, &lowTemperatureAlarmValue);
+M2_S8NUM(el_lowTemperatureAlarm_S8NUM,"+c2", -40, 98, &lowTemperatureAlarmValue_s8);
 M2_LIST(list_lowTemperatureAlarm) = {&el_lowTemperatureAlarm_label, &el_lowTemperatureAlarm_S8NUM};
 M2_HLIST(hlist_lowTemperatureAlarm, NULL, list_lowTemperatureAlarm);
 M2_LABEL(el_highTemperatureAlarm_label, NULL, "High Temp Alarm");
-M2_U8NUM(el_highTemperatureAlarm_U8NUM, "+c2", 0, 120, &highTemperatureAlarmValue);
+M2_U8NUM(el_highTemperatureAlarm_U8NUM, "+c2", 0, 120, &highTemperatureAlarmValue_u8);
 M2_LIST(list_highTemperatureAlarm) = {&el_highTemperatureAlarm_label, &el_highTemperatureAlarm_U8NUM};
 M2_HLIST(hlist_highTemperatureAlarm, NULL, list_highTemperatureAlarm);
 M2_LIST(list_temperatureAlarm) = {&el_title_TemperatureAlarm_label, &hlist_lowTemperatureAlarm, &hlist_highTemperatureAlarm, &el_tempMenuGoBack_button};
