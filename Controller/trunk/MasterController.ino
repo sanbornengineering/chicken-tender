@@ -34,23 +34,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Wire/Wire.h"
 #include "LiquidCrystal_I2C.h"
 #include "M2tk.h"
-#include "utility/m2ghnlc.h"	// 2k of memory taken by this
+#include "utility/m2ghnlc.h"
 #include "Time/Time.h"
 #include "DS1307RTC/DS1307RTC.h"
 #include "TimeAlarms/TimeAlarms.h"
 #include "Narcoleptic/Narcoleptic.h"
-#include "MemoryFree/MemoryFree.h"
+#include "MemoryFree/MemoryFree.h" // library to determine how much ram is used
 
 
 // Defines
 #define _DEBUG
-#define blinkInterval 1000	//blink pin 13 LED every second
+#define _DEBUGEEPROM
+#define blinkInterval 1000	//blink pin 13 LED every second This needs to be changed to a const uint8_t
 //#define sleepInterval 6000 //go to sleep after ten minutes of no user button press
-#define sleepTime 100 // sleep for 500ms then wake up and check the sensors and buttons
-#define sensorInterval 6000 // check sensors ever 10 minutes
-#define alarmInterval 60000 // check alarms ever 1 minute
-
-
+#define sleepTime 100 // sleep for 500ms then wake up and check the sensors and buttons This needs to be changed to a const uint8_t
+#define sensorInterval 6000 // check sensors ever 10 minutes This needs to be changed to a const uint8_t
+#define alarmInterval 60000 // check alarms ever 1 minute This needs to be changed to a const uint8_t
 
 // Global variables
 const uint8_t displayID_u8 = 0;
@@ -61,8 +60,6 @@ const uint8_t closeDoorID_u8 = 4;
 uint8_t stateID = displayID_u8;
 
 // IDs used for user display
-
-
 const uint8_t doNothingkDisplayID_u8 = 0;
 const uint8_t clockDisplayID_u8 = 1;
 const uint8_t alarmDisplayID_u8 = 2;
@@ -71,8 +68,6 @@ const uint8_t gritDisplayID_u8 = 4;
 const uint8_t calciumDisplayID_u8 = 5;
 const uint8_t waterDisplayID_u8 = 6;
 const uint8_t environmentDisplayID_u8 = 7;
-
-
 uint8_t userDisplayID=clockDisplayID_u8;
 unsigned long displayRefreshRate = 1000; 
 uint8_t displayChangeRate_u8 = 3;				// time that the display will switch between screens time = displayRefreshRate*displayChangeRate
@@ -84,7 +79,7 @@ unsigned int checkAlarmsCounter_u16 = 0;
 unsigned int checkAlarmsSleepInterval_u16 = 120;	// Every minute
 unsigned int checkSensorCounter_u16 = 0;
 unsigned int checkSensorsSleepInterval_u16 = 1200;	// Every 10 minutes
-unsigned int displayInterval_u16 = 6000; // check switch displays every 10 seconds this will be selectable later
+uint8_t displayInterval_u8 = 10; // check switch displays every 10 seconds this will be selectable later
 uint8_t displayTimerInterval_u8=10; // switch from user menu to user display after time. In minutes  
 // user buttons
 const uint8_t uiKeySelectPin_U8 = 2;
@@ -106,61 +101,61 @@ uint8_t lcdPowerPin_u8 = 52;
 
 
 // Variables used in the Main menu
-uint8_t el_strlist_mainMenu_first = 0;
-uint8_t el_strlist_mainMenu_cnt = 7;
+uint8_t el_strlist_mainMenu_first_u8 = 0;
+uint8_t el_strlist_mainMenu_cnt_u8 = 7;
 
 // Variables used in the time menu
-uint8_t el_strlist_timeMenu_first = 0;
-uint8_t el_strlist_timeMenu_cnt = 5;
+uint8_t el_strlist_timeMenu_first_u8 = 0;
+uint8_t el_strlist_timeMenu_cnt_u8 = 5;
 
 // Variables used in the set date menu
-uint8_t date_day = 1;
-uint8_t date_month = 1;
-uint8_t date_year = 14;
-uint8_t lastDayMonth = 31;
+uint8_t date_day_u8 = 1;
+uint8_t date_month_u8 = 1;
+uint8_t date_year_u8 = 14;
+uint8_t lastDayMonth_u8 = 31;
 
 // Variables used in the set time menu
-uint8_t time_second = 1;
-uint8_t time_minute = 1;
-uint8_t time_hour = 1;
-uint8_t el_strlist_AMPMMenu_first = 0;
-uint8_t el_strlist_AMPMMenu_cnt = 1;
+uint8_t time_second_u8 = 1;
+uint8_t time_minute_u8 = 1;
+uint8_t time_hour_u8 = 1;
+uint8_t el_strlist_AMPMMenu_first_u8 = 0;
+uint8_t el_strlist_AMPMMenu_cnt_u8 = 1;
 
 // used to determine if it is morning or night for time function set.
 const char *meriden = "AM";
 
 // Variables used in the set open time menu
-uint8_t timeOpen_second = 0;
-uint8_t timeOpen_minute = 0;
+uint8_t timeOpen_second_u8 = 0;
+uint8_t timeOpen_minute_u8 = 0;
 // 
-uint8_t timeOpen_hour = 8;
-uint8_t timeOpen_second_temp = 0; // used to store current alarm values in the even the user cancels the selection
-uint8_t timeOpen_minute_temp = 0;
-uint8_t timeOpen_hour_temp = 8;
+uint8_t timeOpen_hour_u8 = 8;
+uint8_t timeOpen_second_temp_u8 = 0; // used to store current alarm values in the even the user cancels the selection
+uint8_t timeOpen_minute_temp_u8 = 0;
+uint8_t timeOpen_hour_temp_u8 = 8;
 
 // Variables used in the set open time menu
-uint8_t timeClose_second = 0;
-uint8_t timeClose_minute = 0;
-uint8_t timeClose_hour = 8;
-uint8_t timeClose_second_temp = 0; // used to store current alarm values in the even the user cancels the selection
-uint8_t timeClose_minute_temp = 0;
-uint8_t timeClose_hour_temp = 8;
+uint8_t timeClose_second_u8 = 0;
+uint8_t timeClose_minute_u8 = 0;
+uint8_t timeClose_hour_u8 = 8;
+uint8_t timeClose_second_temp_u8 = 0; // used to store current alarm values in the even the user cancels the selection
+uint8_t timeClose_minute_temp_u8 = 0;
+uint8_t timeClose_hour_temp_u8 = 8;
 
 // variables used in the food menu
-uint8_t foodLevel = 10;			//Delete later food level in cm for current food level this should come from main program.
-uint8_t foodLevelMin = 20;		// Food level in cm when feeder is empty
-uint8_t foodLevelMax = 2;		// Food level in cm when feeder is full
-uint8_t foodLevelYesterday = 4; // food level in cm stored each day at night alarm time. 
+uint8_t foodLevel_u8 = 10;			//Delete later food level in cm for current food level this should come from main program.
+uint8_t foodLevelMin_u8 = 30;		// Food level in cm when feeder is empty
+uint8_t foodLevelMax_u8 = 2;		// Food level in cm when feeder is full
+uint8_t foodLevelYesterday_u8 = 4; // food level in cm stored each day at night alarm time. 
 
 // variables used in the grit menu
-uint8_t gritLevel = 5;			// Grit level in cm for current grit level this shall come from main program.
-uint8_t gritLevelMin = 20;		// Grit level in cm when feeder is empty
-uint8_t gritLevelMax = 2;		// Grit level in cm when feeder is full
+uint8_t gritLevel_u8 = 5;			// Grit level in cm for current grit level this shall come from main program.
+uint8_t gritLevelMin_u8 = 20;		// Grit level in cm when feeder is empty
+uint8_t gritLevelMax_u8 = 2;		// Grit level in cm when feeder is full
 
 // variables used in the calcium menu
-uint8_t calciumLevel = 5;			// Calcium level in cm for current calcium level this shall come from main program.
-uint8_t calciumLevelMin = 20;		// Calcium level in cm when feeder is empty
-uint8_t calciumLevelMax = 2;		// Calcium level in cm when feeder is full
+uint8_t calciumLevel_u8 = 5;			// Calcium level in cm for current calcium level this shall come from main program.
+uint8_t calciumLevelMin_u8 = 20;		// Calcium level in cm when feeder is empty
+uint8_t calciumLevelMax_u8 = 2;		// Calcium level in cm when feeder is full
 
 // variables used in the water menu
 uint8_t waterLevel_u8 = 5;			// Water level in cm for current water level this shall come from main program.
@@ -191,11 +186,48 @@ uint8_t temperatureUnits = 0; // 0 = Celsius, 1 = Fahrenheit
 
 const int maxAllowedWrites = 1000;
 const int memBase          = 350;
-const uint8_t firstTime = 0xAB;	// check flag for EEPROM data
+const uint8_t firstTime_u8 = 0xAB;	// check flag for EEPROM data
 
-uint8_t userSetting_u8[] = {firstTime, timeOpen_hour, timeOpen_minute, timeClose_hour, timeClose_minute, 
-							sleepInterval_u8, displayInterval_u16, displayTimerInterval_u8, foodLevelMin, foodLevelMax,
-							gritLevelMin, gritLevelMax, calciumLevelMin, calciumLevelMax, waterLevelMin_u8,
+// EEPROM memory map used later in program to store and read EEPROM data
+/* Must be sequential and no number can be used twice. All variables associated with these addresses 
+   must be 8 bits.*/ 
+// unsigned EEPROM data
+const uint8_t addressFirstTime_u8 = 0;
+const uint8_t addressTimeOpen_hour_u8 = 1;
+const uint8_t addressTimeOpen_minute_u8 = 2;
+const uint8_t addressTimeClose_hour_u8 = 3;
+const uint8_t addressTimeClose_minute_u8 = 4;
+const uint8_t addressSleepInterval_u8 = 5;
+const uint8_t addressDisplayInterval_u8 = 6;
+const uint8_t addressDisplayTimerInterval_u8 = 7;
+const uint8_t addressFoodLevelMin_u8 = 8;
+const uint8_t addressFoodLevelMax_u8 = 9;
+const uint8_t addressGritLevelMin_u8 = 10;
+const uint8_t addressGritLevelMax_u8 = 11;
+const uint8_t addressCalciumLevelMin_u8 = 12;
+const uint8_t addressCalciumLevelMax_u8 = 13;
+const uint8_t addressWaterLevelMin_u8 = 14;
+const uint8_t addressWaterLevelMax_u8 = 15;
+const uint8_t addressHighTemperatureAlarmValue_u8 = 16;
+const uint8_t addressHighTemperatureAlarmMin_u8 = 17;
+const uint8_t addressHighTemperatureAlarmMax_u8 = 18;
+const uint8_t addressHumidityOffset_u8 = 19;
+const uint8_t addressTemperatureUnits_u8 = 20;
+// signed EEPROM data
+const uint8_t addressTemperatureMin_s8 = 21;
+const uint8_t addressTemperatureMax_s8 = 22;
+const uint8_t addressTemperatureOffset_s8 = 23;
+const uint8_t addressTemperatureOffsetMin_s8 = 24;
+const uint8_t addressTemperatureOffsetMax_s8 = 25;
+const uint8_t addressLowTemperatureAlarmValue_s8 = 26;
+const uint8_t addressLowTemperatureAlarmMin_s8 = 27;
+const uint8_t addressLowTemperatureAlarmMax_s8 = 28;
+
+
+
+uint8_t userSetting_u8[] = {firstTime_u8, timeOpen_hour_u8, timeOpen_minute_u8, timeClose_hour_u8, timeClose_minute_u8, 
+							sleepInterval_u8, displayInterval_u8, displayTimerInterval_u8, foodLevelMin_u8, foodLevelMax_u8,
+							gritLevelMin_u8, gritLevelMax_u8, calciumLevelMin_u8, calciumLevelMax_u8, waterLevelMin_u8,
 							waterLevelMax_u8, highTemperatureAlarmValue_u8, highTemperatureAlarmMin_u8, 
 							highTemperatureAlarmMax_u8, humidityOffset_u8, temperatureUnits};
 							
@@ -205,37 +237,37 @@ uint8_t userSetting_s8[] = {temperatureMin_s8, temperatureMax_s8, temperatureOff
 							lowTemperatureAlarmMax_s8};
 
 
-// EEPROM memory map address
 
-int addressFirstTime;
-int addressTimeOpen_hour;
-int addressTimeOpen_minute;
-int addressTimeClose_hour;
-int addressTimeClose_minute;
-int addressSleepInterval;
-int addressDisplayInterval;
-int addressDisplayTimerInterval;
-int addressFoodLevelMin;
-int addressFoodLevelMax;
-int addressGritLevelMin;
-int addressGritLevelMax;
-int addressCalciumLevelMin;
-int addressCalciumLevelMax;
-int addressWaterLevelMin;
-int addressWaterLevelMax;
-int addressTemperatureMin;
-int addressTemperatureMax;
-int addressTemperatureOffset;
-int addressTemperatureOffsetMin;
-int addressTemperatureOffsetMax;
-int addressLowTemperatureAlarmValue;
-int addressLowTemperatureAlarmMin;
-int addressLowTemperatureAlarmMax;
-int addressHighTemperatureAlarmValue;
-int addressHighTemperatureAlarmMin;
-int addressHighTemperatureAlarmMax;
-int addressHumidityOffset;
-int addressTemperatureUnits;
+uint8_t userSettingEepromAddressesAll[] = {addressFirstTime_u8,addressTimeOpen_hour_u8,addressTimeOpen_minute_u8,
+									addressTimeClose_hour_u8,addressTimeClose_minute_u8,addressSleepInterval_u8,
+									addressDisplayInterval_u8,addressDisplayTimerInterval_u8,
+									addressFoodLevelMin_u8,addressFoodLevelMax_u8,addressGritLevelMin_u8,
+									addressGritLevelMax_u8,addressCalciumLevelMin_u8,
+									addressCalciumLevelMax_u8,addressWaterLevelMin_u8,
+									addressWaterLevelMax_u8,addressHighTemperatureAlarmValue_u8,
+									addressHighTemperatureAlarmMin_u8,addressHighTemperatureAlarmMax_u8,
+									addressHumidityOffset_u8,addressTemperatureUnits_u8,
+									addressTemperatureMin_s8,addressTemperatureMax_s8,
+									addressTemperatureOffset_s8,addressTemperatureOffsetMin_s8,
+									addressTemperatureOffsetMax_s8,addressLowTemperatureAlarmValue_s8,
+									addressLowTemperatureAlarmMin_s8,addressLowTemperatureAlarmMax_s8};
+
+uint8_t userSettingEepromAddressesUnsigned[] = {addressFirstTime_u8,addressTimeOpen_hour_u8,addressTimeOpen_minute_u8,addressTimeClose_hour_u8,
+										addressTimeClose_minute_u8,addressSleepInterval_u8,
+										addressDisplayInterval_u8,addressDisplayTimerInterval_u8,
+										addressFoodLevelMin_u8,addressFoodLevelMax_u8,addressGritLevelMin_u8,
+										addressGritLevelMax_u8,addressCalciumLevelMin_u8,
+										addressCalciumLevelMax_u8,addressWaterLevelMin_u8,
+										addressWaterLevelMax_u8,addressHighTemperatureAlarmValue_u8,
+										addressHighTemperatureAlarmMin_u8,addressHighTemperatureAlarmMax_u8,
+										addressHumidityOffset_u8,addressTemperatureUnits_u8};
+										
+										
+uint8_t userSettingEepromAddressesSigned[]={addressTemperatureMin_s8,addressTemperatureMax_s8,
+										addressTemperatureOffset_s8,addressTemperatureOffsetMin_s8,
+										addressTemperatureOffsetMax_s8,addressLowTemperatureAlarmValue_s8,
+										addressLowTemperatureAlarmMin_s8,addressLowTemperatureAlarmMax_s8};
+
 
 //*********************
 // Displays - Prototypes
@@ -350,6 +382,10 @@ void setup() {
 	// put your setup code here, to run once:
 	Serial.begin(9600);
 	delay(1000);			// Wait to allow system to setup
+	
+	// Stores user settings in EEPROM 
+	initEEPROM(); 
+	
 	Serial.println("--------------------------------");
 	Serial.println("Chicken Tender Master Controller V1.0");
 	Serial.println("by Sanborn Engineering");
@@ -369,7 +405,6 @@ void setup() {
 	//Alarm.alarmRepeat(timeOpen_hour,timeOpen_minute, timeOpen_second, openAlarm);
 	//Alarm.alarmRepeat(timeClose_hour,timeClose_minute, timeClose_second, closeAlarm);
 	CT.setupWirelessLink();
-	delay(3000); 
 	#ifdef _DEBUG
 		Serial.println("Setup Finished");
 		Serial.print("Ram Free ");
@@ -508,7 +543,7 @@ void loop() {
 
 		break;	// end user menu mode
 	
-	case closeDoorID:
+	case closeDoorID_u8:
 
 		break;	// end user menu mode		
 		
@@ -656,32 +691,32 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
         case 0:
           //set date
           Serial.println("set date");
-		  date_year = year()-2000;
-		  date_month = month();
-		  date_day = day();
+		  date_year_u8 = year()-2000;
+		  date_month_u8 = month();
+		  date_day_u8 = day();
           m2_SetRoot(&vlist_dateMenu_toplevel);
           break;
         case 1:
           //set time
           Serial.println("set time");
-		  time_hour = hour();
-		  time_minute = minute();
+		  time_hour_u8 = hour();
+		  time_minute_u8 = minute();
           m2_SetRoot(&vlist_timeMenu_toplevel);
           break;
         case 2:
           //"Door open time";
           Serial.println("Door open time");
-          timeOpen_second_temp = timeOpen_second; // used to store current alarm values in the even the user cancels the selection
-          timeOpen_minute_temp = timeOpen_minute;
-          timeOpen_hour_temp = timeOpen_hour;
+          timeOpen_second_temp_u8 = timeOpen_second_u8; // used to store current alarm values in the even the user cancels the selection
+          timeOpen_minute_temp_u8 = timeOpen_minute_u8;
+          timeOpen_hour_temp_u8 = timeOpen_hour_u8;
           m2_SetRoot(&vlist_timeOpenMenu_toplevel);
           break;    
         case 3:
           //"Door close time";
           Serial.println("Door close time");
-          timeClose_second_temp = timeClose_second; // used to store current alarm values in the even the user cancels the selection
-          timeClose_minute_temp = timeClose_minute;
-          timeClose_hour_temp = timeClose_hour;
+          timeClose_second_temp_u8 = timeClose_second_u8; // used to store current alarm values in the even the user cancels the selection
+          timeClose_minute_temp_u8 = timeClose_minute_u8;
+          timeClose_hour_temp_u8 = timeClose_hour_u8;
           m2_SetRoot(&vlist_timeCloseMenu_toplevel);
           break;
         case 4:
@@ -698,22 +733,30 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
 }
 
 
+
+
+
+
+
+
+
+
 //*******************
 // set date functions
 //*******************
 
 void date_ok_fn(m2_el_fnarg_p fnarg)  {
 
-  setTime(hour(), minute(), second(),date_day,date_month,date_year);
+  setTime(hour(), minute(), second(),date_day_u8,date_month_u8,date_year_u8);
   displayDate();
   RTC.set(now());
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
 void date_cancel_fn(m2_el_fnarg_p fnarg)  {
-  date_month = month();
-  date_day = day();
-  date_year = year();
+  date_month_u8 = month();
+  date_day_u8 = day();
+  date_year_u8 = year();
   displayDate();
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
@@ -741,27 +784,23 @@ void meridenSelect_fn(m2_el_fnarg_p fnarg)  {
 uint8_t time_hour_fn(m2_rom_void_p element, uint8_t msg, uint8_t _hour)
 {
 	
-	time_hour = _hour; 
+	time_hour_u8 = _hour; 
 	_hour = hourFormat12();	//convert hour to 12 hour display format for screen
 	return _hour;
 }
 
 void time_ok_fn(m2_el_fnarg_p fnarg)  {
     Serial.println("set time ok");
-    //if (isPM())
-    //{
-		//time_hour +=12;
-	//}	
-	setTime(time_hour, time_minute, time_second,day(),month(),year());
+	setTime(time_hour_u8, time_minute_u8, time_second_u8,day(),month(),year());
 	displayDate();
 	RTC.set(now());
 	m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
 void time_cancel_fn(m2_el_fnarg_p fnarg)  {
-  time_second = second();
-  time_minute = minute();
-  time_hour = hour();
+  time_second_u8 = second();
+  time_minute_u8 = minute();
+  time_hour_u8 = hour();
   displayDate();
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
@@ -773,17 +812,17 @@ void time_cancel_fn(m2_el_fnarg_p fnarg)  {
 void timeOpen_ok_fn(m2_el_fnarg_p fnarg)  {
   //Alarm.alarmRepeat(timeOpen_hour,timeOpen_minute,timeOpen_second, MorningAlarm); 
   Serial.print("Time open");
-  Serial.print(timeOpen_hour);
+  Serial.print(timeOpen_hour_u8);
   Serial.print(":");
-  Serial.print(timeOpen_minute);
+  Serial.print(timeOpen_minute_u8);
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
 void timeOpen_cancel_fn(m2_el_fnarg_p fnarg)  {
   // store the previous value of the alarm in the event the user cancels their input
-  timeOpen_second= timeOpen_second_temp ; // used to store current alarm values in the even the user cancels the selection
-  timeOpen_minute = timeOpen_minute_temp;
-  timeOpen_hour = timeOpen_hour_temp;
+  timeOpen_second_u8= timeOpen_second_temp_u8 ; // used to store current alarm values in the even the user cancels the selection
+  timeOpen_minute_u8 = timeOpen_minute_temp_u8;
+  timeOpen_hour_u8 = timeOpen_hour_temp_u8;
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
@@ -795,17 +834,17 @@ void timeOpen_cancel_fn(m2_el_fnarg_p fnarg)  {
 void timeClose_ok_fn(m2_el_fnarg_p fnarg)  {
   //Alarm.alarmRepeat(timeClose_hour+12,timeClose_minute,timeClose_second, EveningAlarm); 
   Serial.print("Time Close");
-  Serial.print(timeClose_hour);
+  Serial.print(timeClose_hour_u8);
   Serial.print(":");
-  Serial.print(timeClose_minute);
+  Serial.print(timeClose_minute_u8);
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
 void timeClose_cancel_fn(m2_el_fnarg_p fnarg)  {
   // store the previous value of the alarm in the event the user cancels their input
-  timeClose_second = timeClose_second_temp; 
-  timeClose_minute = timeClose_minute_temp;
-  timeClose_hour = timeClose_hour_temp;
+  timeClose_second_u8 = timeClose_second_temp_u8; 
+  timeClose_minute_u8 = timeClose_minute_temp_u8;
+  timeClose_hour_u8 = timeClose_hour_temp_u8;
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
@@ -1067,14 +1106,14 @@ uint8_t foodLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t foodLevelPerc) 
 	
 	
 	float food = CT.foodSensor(temperature_flt);
-	foodLevelPerc = map(food, foodLevelMin, foodLevelMax,1,99);
+	foodLevelPerc = map(food, foodLevelMin_u8, foodLevelMax_u8,1,99);
 	
 	#ifdef _DEBUG
 		Serial.print("Food level = ");
 		Serial.println(food);
 	#endif // _DEBUG
 	
-	if(foodLevelMin<food || food<foodLevelMax)	// if sensor is out of range return 0
+	if(foodLevelMin_u8<food || food<foodLevelMax_u8)	// if sensor is out of range return 0
 	{
 		return NULL;
 	}
@@ -1087,7 +1126,7 @@ uint8_t foodLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t foodLevelPerc) 
 uint8_t foodLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t foodLevelYesterday) {
 	
 	
-	int8_t foodLevelChange = foodLevel - foodLevelYesterday;
+	int8_t foodLevelChange = foodLevel_u8 - foodLevelYesterday;
 	
 	return foodLevelChange;
 	
@@ -1104,13 +1143,13 @@ uint8_t gritLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevelPerc) 
 	
 	
 	float grit = CT.gritSensor(temperature_flt);
-	gritLevelPerc = map(grit, gritLevelMin, gritLevelMax,1,99);
+	gritLevelPerc = map(grit, gritLevelMin_u8, gritLevelMax_u8,1,99);
 	#ifdef _DEBUG
 		Serial.print("Grit level = ");
 		Serial.println(grit);
 	#endif // _DEBUG
 	
-	if(gritLevelMin<grit || grit<gritLevelMax)	// if sensor is out of range return 0
+	if(gritLevelMin_u8<grit || grit<gritLevelMax_u8)	// if sensor is out of range return 0
 	{
 		return NULL;
 	}
@@ -1123,7 +1162,7 @@ uint8_t gritLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevelPerc) 
 uint8_t gritLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevelYesterday) {
 	
 	
-	int8_t gritLevelChange = gritLevel - gritLevelYesterday;
+	int8_t gritLevelChange = gritLevel_u8 - gritLevelYesterday;
 	
 	return gritLevelChange;
 	
@@ -1136,12 +1175,12 @@ uint8_t gritLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t gritLevel
 uint8_t calciumLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t calciumLevelPerc) {
 	
 	float calcium = CT.calciumSensor(temperature_flt);
-	calciumLevelPerc = map(calcium, calciumLevelMin, calciumLevelMax,1,99);
+	calciumLevelPerc = map(calcium, calciumLevelMin_u8, calciumLevelMax_u8,1,99);
 	#ifdef _DEBUG
 		Serial.print("Calcium level = ");
 		Serial.println(calcium);
 	#endif // _DEBUG
-	if(calciumLevelMin<calcium || calcium<calciumLevelMax)	// if sensor is out of range return 0
+	if(calciumLevelMin_u8<calcium || calcium<calciumLevelMax_u8)	// if sensor is out of range return 0
 	{
 		return NULL;
 	}
@@ -1153,7 +1192,7 @@ uint8_t calciumLevel_fn(m2_rom_void_p element, uint8_t msg, uint8_t calciumLevel
 uint8_t calciumLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t calciumLevelYesterday) {
 	
 	
-	int8_t calciumLevelChange = calciumLevel - calciumLevelYesterday;
+	int8_t calciumLevelChange = calciumLevel_u8 - calciumLevelYesterday;
 	
 	return calciumLevelChange;
 	
@@ -1240,6 +1279,69 @@ boolean lowTemperatureAlarm(int8_t actualTemperature, int8_t lowTemperatureThres
 	return lowTemperatureFlag;
 }
 
+//***********************
+// EEPROM Functions
+//***********************
+
+// Function used to store EEPROM values first time program is stored
+boolean initEEPROM()
+{
+	if(EEPROM.read(0) == userSetting_u8[0])
+	{
+		Serial.println("EEPROM Already contains information");
+		// store unsigned variables in EEPROM
+		for(uint8_t i = 0; i<sizeof(userSettingEepromAddressesUnsigned)-1; i++)
+		{
+			userSetting_u8[i] = EEPROM.read(userSettingEepromAddressesUnsigned[i]);
+		}
+
+		// store signed variables in EEPROM
+		for(uint8_t j = 0; j<sizeof(userSettingEepromAddressesSigned)-1; j++)
+		{
+			userSetting_s8[j] = EEPROM.read(userSettingEepromAddressesSigned[j]);
+		}				// store unsigned variables in EEPROM
+		
+	}
+	else // First time storing data in EEPROM
+	{
+		// store unsigned variables in EEPROM
+		for(uint8_t i = 0; i<sizeof(userSettingEepromAddressesUnsigned); i++)
+		{
+			EEPROM.write(userSettingEepromAddressesUnsigned[i],userSetting_u8[i]);
+		}
+		
+		// store signed variables in EEPROM
+		for(uint8_t j = 0; j<sizeof(userSettingEepromAddressesSigned); j++)
+		{
+			EEPROM.write(userSettingEepromAddressesSigned[j],userSetting_s8[j]);
+		}
+		
+		
+	}
+	
+	#ifdef _DEBUGEEPROM
+	Serial.println("initialize EEPROM Complete");
+	for(uint8_t k = 0; k<sizeof(userSettingEepromAddressesUnsigned); k++)
+	{
+		Serial.print("EEPROM location " );
+		Serial.print(userSettingEepromAddressesUnsigned[k]);
+		Serial.print(" = " );
+		Serial.println(EEPROM.read(userSettingEepromAddressesUnsigned[k]));
+	}
+
+	// store signed variables in EEPROM
+	for(uint8_t l = 0; l<sizeof(userSettingEepromAddressesSigned); l++)
+	{
+		Serial.print("EEPROM location " );
+		Serial.print(userSettingEepromAddressesSigned[l]);
+		Serial.print(" = " );
+		Serial.println(EEPROM.read(userSettingEepromAddressesSigned[l]));
+	}
+	
+	#endif // _DEBUG
+	return NULL;
+}
+
 
 //***********************
 // Labels used in program
@@ -1303,10 +1405,10 @@ M2_VLIST(vlist_dateTimeDisplay_toplevel, NULL, list_dateTimeDisplay);
 //*******************
 // Alarms display
 //*******************
-M2_U8NUM(el_openHour_label, "c2r1", 1,12, &timeOpen_hour); // Hour When door opens
-M2_U8NUM(el_openMinute_label, "c2r1", 0,59, &timeOpen_minute); // Minute When door opens
-M2_U8NUM(el_closeHour_label, "c2r1", 1,12, &timeClose_hour); // Hour When door closes
-M2_U8NUM(el_closeMinute_label, "c2r1", 0,59, &timeClose_minute); // Minute When door closes
+M2_U8NUM(el_openHour_label, "c2r1", 1,12, &timeOpen_hour_u8); // Hour When door opens
+M2_U8NUM(el_openMinute_label, "c2r1", 0,59, &timeOpen_minute_u8); // Minute When door opens
+M2_U8NUM(el_closeHour_label, "c2r1", 1,12, &timeClose_hour_u8); // Hour When door closes
+M2_U8NUM(el_closeMinute_label, "c2r1", 0,59, &timeClose_minute_u8); // Minute When door closes
 M2_LIST(list_openTime) = {&el_openHour_label, &el_colon_label, &el_openMinute_label, &el_AM_label};
 M2_HLIST(hlist_openTime, NULL, list_openTime);
 M2_LIST(list_closeTime) = {&el_closeHour_label, &el_colon_label, &el_closeMinute_label, &el_PM_label};
@@ -1402,8 +1504,8 @@ M2_VLIST(vlist_environmentDisplay_toplevel, NULL, list_environmentUserDisplay);
 //*******************
 // Main Menu setup
 //*******************
-M2_STRLIST(el_strlist_mainMenu, "l3w15", &el_strlist_mainMenu_first, &el_strlist_mainMenu_cnt, el_strlist_mainMenu_getstr);
-M2_VSB(el_strlist_mainMenu_vsb, "l3w1", &el_strlist_mainMenu_first, &el_strlist_mainMenu_cnt);
+M2_STRLIST(el_strlist_mainMenu, "l3w15", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8, el_strlist_mainMenu_getstr);
+M2_VSB(el_strlist_mainMenu_vsb, "l3w1", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8);
 M2_LIST(list_strlist_mainMenu) = { &el_strlist_mainMenu_vsb , &el_strlist_mainMenu };
 M2_HLIST(el_strlist_mainMenu_hlist, NULL, list_strlist_mainMenu);
 M2_LIST(list_label_strlist_mainMenu) = {&el_mainMenu_label, &el_strlist_mainMenu_hlist};
@@ -1413,8 +1515,8 @@ M2_VLIST(vlist_mainMenu_toplevel, NULL, list_label_strlist_mainMenu);
 //*******************
 // Time menu setup
 //*******************
-M2_STRLIST(el_strlist_timeMenu, "l3w15", &el_strlist_timeMenu_first, &el_strlist_timeMenu_cnt, el_strlist_timeMenu_getstr);
-M2_VSB(el_strlist_timeMenu_vsb, "l3w1", &el_strlist_timeMenu_first, &el_strlist_timeMenu_cnt);
+M2_STRLIST(el_strlist_timeMenu, "l3w15", &el_strlist_timeMenu_first_u8, &el_strlist_timeMenu_cnt_u8, el_strlist_timeMenu_getstr);
+M2_VSB(el_strlist_timeMenu_vsb, "l3w1", &el_strlist_timeMenu_first_u8, &el_strlist_timeMenu_cnt_u8);
 // determines the horizontal position of the elements vs the scroll bar
 M2_LIST(list_strlist_timeMenu) = { &el_strlist_timeMenu_vsb , /*&el_space,*/ &el_strlist_timeMenu };
 M2_HLIST(el_strlist_timeMenu_hlist, NULL, list_strlist_timeMenu);
@@ -1424,9 +1526,9 @@ M2_VLIST(vlist_dateTimeMenu_toplevel, NULL, list_label_strlist_timeMenu);
 //*******************
 // Set Date menu setup
 //*******************
-M2_U8NUM(el_date_day, "a0c2", 1,31, &date_day);
-M2_U8NUM(el_date_month, "a0c2", 1,12,&date_month);
-M2_U8NUM(el_date_year, "a0c2", 0,99,&date_year);
+M2_U8NUM(el_date_day, "a0c2", 1,31, &date_day_u8);
+M2_U8NUM(el_date_month, "a0c2", 1,12,&date_month_u8);
+M2_U8NUM(el_date_year, "a0c2", 0,99,&date_year_u8);
 M2_LIST(list_date) = { &el_date_month, &el_slash_label, &el_date_day, &el_slash_label, &el_date_year };
 M2_HLIST(hlist_date, NULL, list_date);
 M2_BUTTON(el_date_cancel, NULL, "CANCEL", date_cancel_fn);
@@ -1441,9 +1543,9 @@ M2_VLIST(vlist_dateMenu_toplevel, NULL, list_dateMenu);
 //*******************
 
 M2_U8NUMFN(el_time_hour, "c2", 1,12,time_hour_fn);
-M2_U8NUM(el_time_minute, "c2", 0,59,&time_minute);
+M2_U8NUM(el_time_minute, "c2", 0,59,&time_minute_u8);
 M2_U8NUMFN(el_time_second, "c2r1", 0,59,getSeconds);
-M2_BUTTONPTR(el_meriden_button,NULL,&meriden, meridenSelect_fn);
+M2_BUTTONPTR(el_meriden_button,NULL, &meriden, meridenSelect_fn);
 M2_LIST(list_time) = { &el_time_hour, &el_colon_label, &el_time_minute, &el_colon_label, &el_time_second, &el_dash_label, &el_meriden_button};
 M2_HLIST(hlist_time, NULL, list_time);
 M2_BUTTON(el_time_cancel, NULL, "CANCEL", time_cancel_fn);
@@ -1459,9 +1561,9 @@ M2_VLIST(vlist_timeMenu_toplevel, NULL, list_timeMenu);
 // Open time menu
 //*******************
 
-M2_U8NUM(el_timeOpen_hour, "c2", 1,12,&timeOpen_hour);
-M2_U8NUM(el_timeOpen_minute, "c2", 0,59,&timeOpen_minute);
-M2_U8NUM(el_timeOpen_second, "c2r1", 0,59,&timeOpen_second);
+M2_U8NUM(el_timeOpen_hour, "c2", 1,12,&timeOpen_hour_u8);
+M2_U8NUM(el_timeOpen_minute, "c2", 0,59,&timeOpen_minute_u8);
+M2_U8NUM(el_timeOpen_second, "c2r1", 0,59,&timeOpen_second_u8);
 M2_LIST(list_timeOpen) = { &el_timeOpen_hour, &el_colon_label, &el_timeOpen_minute, &el_colon_label, &el_timeOpen_second};
 M2_HLIST(hlist_timeOpen, NULL, list_timeOpen);
 M2_BUTTON(el_timeOpen_cancel, NULL, "CANCEL", timeOpen_cancel_fn);
@@ -1477,9 +1579,9 @@ M2_VLIST(vlist_timeOpenMenu_toplevel, NULL, list_timeOpenMenu);
 // Close time
 //*******************
 
-M2_U8NUM(el_timeClose_hour, "c2", 1,12,&timeClose_hour);
-M2_U8NUM(el_timeClose_minute, "c2", 0,59,&timeClose_minute);
-M2_U8NUM(el_timeClose_second, "c2r1", 0,59,&timeClose_second);
+M2_U8NUM(el_timeClose_hour, "c2", 1,12,&timeClose_hour_u8);
+M2_U8NUM(el_timeClose_minute, "c2", 0,59,&timeClose_minute_u8);
+M2_U8NUM(el_timeClose_second, "c2r1", 0,59,&timeClose_second_u8);
 M2_LIST(list_timeClose) = { &el_timeClose_hour, &el_colon_label, &el_timeClose_minute, &el_colon_label, &el_timeClose_second};
 M2_HLIST(hlist_timeClose, NULL, list_timeClose);
 M2_BUTTON(el_timeClose_cancel, NULL, "CANCEL", timeClose_cancel_fn);
@@ -1497,11 +1599,11 @@ M2_U8NUMFN(el_foodLevelValue_U8, "c2r1",0,99, foodLevel_fn);
 M2_LIST(list_foodLevel) = {&el_foodLevel_label, &el_foodLevelValue_U8, &el_percent_label};
 M2_HLIST(hlist_foodLevel, NULL, list_foodLevel);
 M2_LABEL(el_foodLevelMax_label, NULL,"Food Max");
-M2_U8NUM(el_foodLevelMax_U8, "c2", 0, 99,&foodLevelMax);
+M2_U8NUM(el_foodLevelMax_U8, "c2", 0, 99,&foodLevelMax_u8);
 M2_LIST(list_foodLevelMax) = {&el_foodLevelMax_label, &el_foodLevelMax_U8, &el_cm_label};
 M2_HLIST(hlist_foodLevelMax, NULL, list_foodLevelMax);
 M2_LABEL(el_foodLevelMin_label, NULL,"Food Min");
-M2_U8NUM(el_foodLevelMin_U8, "c2", 0, 99, &foodLevelMin);
+M2_U8NUM(el_foodLevelMin_U8, "c2", 0, 99, &foodLevelMin_u8);
 M2_LIST(list_foodLevelMin) = {&el_foodLevelMin_label, &el_foodLevelMin_U8, &el_cm_label};
 M2_HLIST(hlist_foodLevelMin, NULL, list_foodLevelMin);
 M2_LIST(list_foodMenu) = {&hlist_foodLevel, &hlist_foodLevelMin, &hlist_foodLevelMax, &el_mainMenuGoBack_button};
@@ -1516,11 +1618,11 @@ M2_U8NUMFN(el_gritLevelValue_U8, "c2r1", 0,99, gritLevel_fn);
 M2_LIST(list_gritLevel) = {&el_gritLevel_label, &el_gritLevelValue_U8, &el_percent_label};
 M2_HLIST(hlist_gritLevel, NULL, list_gritLevel);
 M2_LABEL(el_gritLevelMax_label, NULL,"Grit Max");
-M2_U8NUM(el_gritLevelMax_U8, "c2", 0, 99,&gritLevelMax);
+M2_U8NUM(el_gritLevelMax_U8, "c2", 0, 99,&gritLevelMax_u8);
 M2_LIST(list_gritLevelMax) = {&el_gritLevelMax_label, &el_gritLevelMax_U8, &el_cm_label};
 M2_HLIST(hlist_gritLevelMax, NULL, list_gritLevelMax);
 M2_LABEL(el_gritLevelMin_label, NULL,"Grit Min");
-M2_U8NUM(el_gritLevelMin_U8, "c2", 0, 99, &gritLevelMin);
+M2_U8NUM(el_gritLevelMin_U8, "c2", 0, 99, &gritLevelMin_u8);
 M2_LIST(list_gritLevelMin) = {&el_gritLevelMin_label, &el_gritLevelMin_U8, &el_cm_label};
 M2_HLIST(hlist_gritLevelMin, NULL, list_gritLevelMin);
 M2_LIST(list_gritMenu) = {&hlist_gritLevel, &hlist_gritLevelMin, &hlist_gritLevelMax, &el_mainMenuGoBack_button};
@@ -1535,11 +1637,11 @@ M2_U8NUMFN(el_calciumLevelValue_U8, "c2r1", 0,99, calciumLevel_fn);
 M2_LIST(list_calciumLevel) = {&el_calciumLevel_label, &el_calciumLevelValue_U8, &el_percent_label};
 M2_HLIST(hlist_calciumLevel, NULL, list_calciumLevel);
 M2_LABEL(el_calciumLevelMax_label, NULL,"Cal. Max");
-M2_U8NUM(el_calciumLevelMax_U8, "c2", 0, 99, &calciumLevelMax);
+M2_U8NUM(el_calciumLevelMax_U8, "c2", 0, 99, &calciumLevelMax_u8);
 M2_LIST(list_calciumLevelMax) = {&el_calciumLevelMax_label, &el_calciumLevelMax_U8, &el_cm_label};	
 M2_HLIST(hlist_calciumLevelMax, NULL, list_calciumLevelMax);
 M2_LABEL(el_calciumLevelMin_label, NULL,"Cal. Min");
-M2_U8NUM(el_calciumLevelMin_U8, "c2", 0, 99, &calciumLevelMin);
+M2_U8NUM(el_calciumLevelMin_U8, "c2", 0, 99, &calciumLevelMin_u8);
 M2_LIST(list_calciumLevelMin) = {&el_calciumLevelMin_label, &el_calciumLevelMin_U8, &el_cm_label};
 M2_HLIST(hlist_calciumLevelMin, NULL, list_calciumLevelMin);
 M2_LIST(list_calciumMenu) = {&hlist_calciumLevel, &hlist_calciumLevelMin, &hlist_calciumLevelMax, &el_mainMenuGoBack_button};
