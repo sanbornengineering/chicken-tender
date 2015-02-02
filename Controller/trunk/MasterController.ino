@@ -27,9 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Description: see latest date ProductDescriptionMasterController.odt  */
 /* Description: see latest date ProductDescriptionMasterController.odt  */
 /************************************************************************/ 
-#include <Arduino.h>
+#include "Arduino.h"
 #include "ChickenTender/ChickenTender.h"
-#include <EEPROMEx/EEPROMex.h>
+#include "EEPROMEx/EEPROMex.h"
 #include "avr/pgmspace.h"
 #include "Wire/Wire.h"
 #include "LiquidCrystal_I2C.h"
@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 // Defines
-#define _DEBUG
+//#define _DEBUG
 #define _DEBUGEEPROM
 #define blinkInterval 1000	//blink pin 13 LED every second This needs to be changed to a const uint8_t
 //#define sleepInterval 6000 //go to sleep after ten minutes of no user button press
@@ -79,7 +79,7 @@ unsigned int checkAlarmsCounter_u16 = 0;
 unsigned int checkAlarmsSleepInterval_u16 = 120;	// Every minute
 unsigned int checkSensorCounter_u16 = 0;
 unsigned int checkSensorsSleepInterval_u16 = 1200;	// Every 10 minutes
-uint8_t displayInterval_u8 = 10; // check switch displays every 10 seconds this will be selectable later
+uint8_t displayInterval_u8 = 10; // This is not used. What is it for? 
 uint8_t displayTimerInterval_u8=10; // switch from user menu to user display after time. In minutes  
 // user buttons
 const uint8_t uiKeySelectPin_U8 = 2;
@@ -186,7 +186,7 @@ uint8_t temperatureUnits = 0; // 0 = Celsius, 1 = Fahrenheit
 
 const int maxAllowedWrites = 1000;
 const int memBase          = 350;
-const uint8_t firstTime_u8 = 0xAB;	// check flag for EEPROM data
+const uint8_t firstTime_u8 = 0xAC;	// check flag for EEPROM data
 
 // EEPROM memory map used later in program to store and read EEPROM data
 /* Must be sequential and no number can be used twice. All variables associated with these addresses 
@@ -225,16 +225,16 @@ const uint8_t addressLowTemperatureAlarmMax_s8 = 28;
 
 
 
-uint8_t userSetting_u8[] = {firstTime_u8, timeOpen_hour_u8, timeOpen_minute_u8, timeClose_hour_u8, timeClose_minute_u8, 
-							sleepInterval_u8, displayInterval_u8, displayTimerInterval_u8, foodLevelMin_u8, foodLevelMax_u8,
-							gritLevelMin_u8, gritLevelMax_u8, calciumLevelMin_u8, calciumLevelMax_u8, waterLevelMin_u8,
-							waterLevelMax_u8, highTemperatureAlarmValue_u8, highTemperatureAlarmMin_u8, 
-							highTemperatureAlarmMax_u8, humidityOffset_u8, temperatureUnits};
-							
-					
-uint8_t userSetting_s8[] = {temperatureMin_s8, temperatureMax_s8, temperatureOffset_s8, temperatureOffsetMin_s8, 
-							temperatureOffsetMax_s8, lowTemperatureAlarmValue_s8, lowTemperatureAlarmMin_s8,
-							lowTemperatureAlarmMax_s8};
+//uint8_t userSetting_u8[] = {firstTime_u8, timeOpen_hour_u8, timeOpen_minute_u8, timeClose_hour_u8, timeClose_minute_u8, 
+							//sleepInterval_u8, displayInterval_u8, displayTimerInterval_u8, foodLevelMin_u8, foodLevelMax_u8,
+							//gritLevelMin_u8, gritLevelMax_u8, calciumLevelMin_u8, calciumLevelMax_u8, waterLevelMin_u8,
+							//waterLevelMax_u8, highTemperatureAlarmValue_u8, highTemperatureAlarmMin_u8, 
+							//highTemperatureAlarmMax_u8, humidityOffset_u8, temperatureUnits};
+							//
+					//
+//uint8_t userSetting_s8[] = {temperatureMin_s8, temperatureMax_s8, temperatureOffset_s8, temperatureOffsetMin_s8, 
+							//temperatureOffsetMax_s8, lowTemperatureAlarmValue_s8, lowTemperatureAlarmMin_s8,
+							//lowTemperatureAlarmMax_s8};
 
 
 
@@ -252,21 +252,21 @@ uint8_t userSettingEepromAddressesAll[] = {addressFirstTime_u8,addressTimeOpen_h
 									addressTemperatureOffsetMax_s8,addressLowTemperatureAlarmValue_s8,
 									addressLowTemperatureAlarmMin_s8,addressLowTemperatureAlarmMax_s8};
 
-uint8_t userSettingEepromAddressesUnsigned[] = {addressFirstTime_u8,addressTimeOpen_hour_u8,addressTimeOpen_minute_u8,addressTimeClose_hour_u8,
-										addressTimeClose_minute_u8,addressSleepInterval_u8,
-										addressDisplayInterval_u8,addressDisplayTimerInterval_u8,
-										addressFoodLevelMin_u8,addressFoodLevelMax_u8,addressGritLevelMin_u8,
-										addressGritLevelMax_u8,addressCalciumLevelMin_u8,
-										addressCalciumLevelMax_u8,addressWaterLevelMin_u8,
-										addressWaterLevelMax_u8,addressHighTemperatureAlarmValue_u8,
-										addressHighTemperatureAlarmMin_u8,addressHighTemperatureAlarmMax_u8,
-										addressHumidityOffset_u8,addressTemperatureUnits_u8};
-										
-										
-uint8_t userSettingEepromAddressesSigned[]={addressTemperatureMin_s8,addressTemperatureMax_s8,
-										addressTemperatureOffset_s8,addressTemperatureOffsetMin_s8,
-										addressTemperatureOffsetMax_s8,addressLowTemperatureAlarmValue_s8,
-										addressLowTemperatureAlarmMin_s8,addressLowTemperatureAlarmMax_s8};
+//uint8_t userSettingEepromAddressesUnsigned[] = {addressFirstTime_u8,addressTimeOpen_hour_u8,addressTimeOpen_minute_u8,addressTimeClose_hour_u8,
+										//addressTimeClose_minute_u8,addressSleepInterval_u8,
+										//addressDisplayInterval_u8,addressDisplayTimerInterval_u8,
+										//addressFoodLevelMin_u8,addressFoodLevelMax_u8,addressGritLevelMin_u8,
+										//addressGritLevelMax_u8,addressCalciumLevelMin_u8,
+										//addressCalciumLevelMax_u8,addressWaterLevelMin_u8,
+										//addressWaterLevelMax_u8,addressHighTemperatureAlarmValue_u8,
+										//addressHighTemperatureAlarmMin_u8,addressHighTemperatureAlarmMax_u8,
+										//addressHumidityOffset_u8,addressTemperatureUnits_u8};
+										//
+										//
+//uint8_t userSettingEepromAddressesSigned[]={addressTemperatureMin_s8,addressTemperatureMax_s8,
+										//addressTemperatureOffset_s8,addressTemperatureOffsetMin_s8,
+										//addressTemperatureOffsetMax_s8,addressLowTemperatureAlarmValue_s8,
+										//addressLowTemperatureAlarmMin_s8,addressLowTemperatureAlarmMax_s8};
 
 
 //*********************
@@ -405,11 +405,10 @@ void setup() {
 	//Alarm.alarmRepeat(timeOpen_hour,timeOpen_minute, timeOpen_second, openAlarm);
 	//Alarm.alarmRepeat(timeClose_hour,timeClose_minute, timeClose_second, closeAlarm);
 	CT.setupWirelessLink();
-	#ifdef _DEBUG
-		Serial.println("Setup Finished");
-		Serial.print("Ram Free ");
-		Serial.println(freeMemory());
-	#endif // _DEBUG
+	Serial.println("Setup Finished");
+	Serial.print("Ram Free ");
+	Serial.println(freeMemory());
+	delay(3000); // delay for user to see sanborn engineering screen
 }
 
 void loop() {
@@ -449,6 +448,11 @@ void loop() {
 			if(!CT.debounceButton(uiKeySelectPin_U8)|| !CT.debounceButton(uiKeyNextPin_u8))
 			{
 				stateID = userMenuID_u8;		// jump to user menu
+				#ifdef _DEBUG
+					Serial.println("Select/Next Button Pressed");	// Hold until button is released
+					Serial.println("User Menu");	// Hold until button is released
+				#endif // _DEBUG
+				
 				CT.sleepTimer(sleepInterval_u8, true);		// reset sleep timer
 				m2_SetRoot(&vlist_mainMenu_toplevel);
 				m2_Draw();
@@ -522,6 +526,9 @@ void loop() {
 			m2.checkKey();
 			if ( m2.handleKey() )
 			{
+				#ifdef _DEBUG
+					Serial.println("Button Pressed");
+				#endif // _DEBUG
 				m2.draw();
 				CT.displayTimer(displayTimerInterval_u8, true);
 			}
@@ -764,34 +771,68 @@ void date_cancel_fn(m2_el_fnarg_p fnarg)  {
 //***********************
 // set AM or PM depending on user selection
 //************************
+
+
+
+uint8_t time_hour_fn(m2_rom_void_p element, uint8_t msg, uint8_t val)
+{
+	#ifdef _DEBUG
+	Serial.print("Incoming VAL = ");	
+	Serial.println(val);
+	#endif
+
+	if ( msg == M2_U8_MSG_GET_VALUE )
+	{
+		if (isPM())
+		{
+			val = time_hour_u8-12;
+		} 
+		else
+		{
+			val = time_hour_u8;
+		}
+	}
+	#ifdef _DEBUG
+	Serial.print("Returning VAL = ");	
+	Serial.println(val);
+	#endif
+	return val;
+}
+
+// Function to handle AM/PM selection in set time menu
 void meridenSelect_fn(m2_el_fnarg_p fnarg)  {
-	
-	if (isAM())
+	// when the button is clicked the following is executed.
+	if ("AM" == meriden )
+	{
+		
+		meriden = "PM";
+	}
+	else
 	{
 		meriden = "AM";
 	}
-	else if (isPM())
-	{
-		meriden = "PM";
-	}
-	
+	#ifdef _DEBUG
+	Serial.println(meriden);
+	#endif
+
 }
 
 //*******************
 // set time functions
 //*******************
 
-uint8_t time_hour_fn(m2_rom_void_p element, uint8_t msg, uint8_t _hour)
-{
-	
-	time_hour_u8 = _hour; 
-	_hour = hourFormat12();	//convert hour to 12 hour display format for screen
-	return _hour;
-}
-
 void time_ok_fn(m2_el_fnarg_p fnarg)  {
     Serial.println("set time ok");
-	setTime(time_hour_u8, time_minute_u8, time_second_u8,day(),month(),year());
+	uint8_t temp_hour_u8;
+	if ("PM" == meriden)
+	{
+		temp_hour_u8 = time_hour_u8+12;
+	}	
+	else
+	{
+		temp_hour_u8 = time_hour_u8;
+	}	
+	setTime(temp_hour_u8, time_minute_u8, time_second_u8,day(),month(),year());
 	displayDate();
 	RTC.set(now());
 	m2_SetRoot(&vlist_dateTimeMenu_toplevel);
@@ -1286,56 +1327,87 @@ boolean lowTemperatureAlarm(int8_t actualTemperature, int8_t lowTemperatureThres
 // Function used to store EEPROM values first time program is stored
 boolean initEEPROM()
 {
-	if(EEPROM.read(0) == userSetting_u8[0])
+	if(EEPROM.read(0) == firstTime_u8)
 	{
 		Serial.println("EEPROM Already contains information");
-		// store unsigned variables in EEPROM
-		for(uint8_t i = 0; i<sizeof(userSettingEepromAddressesUnsigned)-1; i++)
-		{
-			userSetting_u8[i] = EEPROM.read(userSettingEepromAddressesUnsigned[i]);
-		}
+		// read unsigned variables from EEPROM
+		timeOpen_hour_u8 = EEPROM.read(addressTimeOpen_hour_u8);
+		timeOpen_minute_u8 = EEPROM.read(addressTimeOpen_minute_u8);
+		timeClose_hour_u8 = EEPROM.read(addressTimeClose_hour_u8);
+		timeClose_minute_u8 = EEPROM.read(addressTimeClose_minute_u8);
+		sleepInterval_u8 = EEPROM.read(addressSleepInterval_u8);
+		displayInterval_u8 = EEPROM.read(addressDisplayInterval_u8);
+		displayTimerInterval_u8 = EEPROM.read(addressDisplayTimerInterval_u8);
+		foodLevelMin_u8 = EEPROM.read(addressFoodLevelMin_u8);
+		foodLevelMax_u8 = EEPROM.read(addressFoodLevelMax_u8);
+		gritLevelMin_u8 = EEPROM.read(addressGritLevelMin_u8);
+		gritLevelMax_u8 = EEPROM.read(addressGritLevelMax_u8);
+		calciumLevelMin_u8 = EEPROM.read(addressCalciumLevelMin_u8);
+		calciumLevelMax_u8 = EEPROM.read(addressCalciumLevelMax_u8);
+		waterLevelMin_u8 = EEPROM.read(addressWaterLevelMin_u8);
+		waterLevelMax_u8 = EEPROM.read(addressWaterLevelMax_u8);
+		highTemperatureAlarmValue_u8 = EEPROM.read(addressHighTemperatureAlarmValue_u8);
+		highTemperatureAlarmMin_u8 = EEPROM.read(addressHighTemperatureAlarmMin_u8);
+		highTemperatureAlarmMax_u8 = EEPROM.read(addressHighTemperatureAlarmMax_u8);
+		humidityOffset_u8 = EEPROM.read(addressHumidityOffset_u8);
+		temperatureUnits = EEPROM.read(addressTemperatureUnits_u8);
 
-		// store signed variables in EEPROM
-		for(uint8_t j = 0; j<sizeof(userSettingEepromAddressesSigned)-1; j++)
-		{
-			userSetting_s8[j] = EEPROM.read(userSettingEepromAddressesSigned[j]);
-		}				// store unsigned variables in EEPROM
-		
+		// read unsigned variables from EEPROM
+		temperatureMin_s8 = EEPROM.read(addressTemperatureMin_s8);
+		temperatureMax_s8 = EEPROM.read(addressTemperatureMax_s8);
+		temperatureOffset_s8 = EEPROM.read(addressTemperatureOffset_s8);
+		temperatureOffsetMin_s8 = EEPROM.read(addressTemperatureOffsetMin_s8);
+		temperatureOffsetMax_s8 = EEPROM.read(addressTemperatureOffsetMax_s8);
+		lowTemperatureAlarmValue_s8 = EEPROM.read(addressLowTemperatureAlarmValue_s8);
+		lowTemperatureAlarmMin_s8 = EEPROM.read(addressLowTemperatureAlarmMin_s8);
+		lowTemperatureAlarmMax_s8 = EEPROM.read(addressLowTemperatureAlarmMax_s8);	
 	}
 	else // First time storing data in EEPROM
 	{
-		// store unsigned variables in EEPROM
-		for(uint8_t i = 0; i<sizeof(userSettingEepromAddressesUnsigned); i++)
-		{
-			EEPROM.write(userSettingEepromAddressesUnsigned[i],userSetting_u8[i]);
-		}
-		
-		// store signed variables in EEPROM
-		for(uint8_t j = 0; j<sizeof(userSettingEepromAddressesSigned); j++)
-		{
-			EEPROM.write(userSettingEepromAddressesSigned[j],userSetting_s8[j]);
-		}
-		
+		Serial.println("EEPROM Empty place data inside");
+		// write unsigned variables to EEPROM
+		EEPROM.write(addressFirstTime_u8,firstTime_u8);
+		EEPROM.write(addressTimeOpen_hour_u8,timeOpen_hour_u8);
+		EEPROM.write(addressTimeOpen_minute_u8,timeOpen_minute_u8);
+		EEPROM.write(addressTimeClose_hour_u8,timeClose_hour_u8);
+		EEPROM.write(addressTimeClose_minute_u8,timeClose_minute_u8);
+		EEPROM.write(addressSleepInterval_u8,sleepInterval_u8);
+		EEPROM.write(addressDisplayInterval_u8,displayInterval_u8);
+		EEPROM.write(addressDisplayTimerInterval_u8,displayTimerInterval_u8);
+		EEPROM.write(addressFoodLevelMin_u8,foodLevelMin_u8);
+		EEPROM.write(addressFoodLevelMax_u8,foodLevelMax_u8);
+		EEPROM.write(addressGritLevelMin_u8,gritLevelMin_u8);
+		EEPROM.write(addressGritLevelMax_u8,gritLevelMax_u8);
+		EEPROM.write(addressCalciumLevelMin_u8,calciumLevelMin_u8);
+		EEPROM.write(addressCalciumLevelMax_u8,calciumLevelMax_u8);
+		EEPROM.write(addressWaterLevelMin_u8,waterLevelMin_u8);
+		EEPROM.write(addressWaterLevelMax_u8,waterLevelMax_u8);
+		EEPROM.write(addressHighTemperatureAlarmValue_u8,highTemperatureAlarmValue_u8);
+		EEPROM.write(addressHighTemperatureAlarmMin_u8,highTemperatureAlarmMin_u8);
+		EEPROM.write(addressHighTemperatureAlarmMax_u8,highTemperatureAlarmMax_u8);
+		EEPROM.write(addressHumidityOffset_u8,humidityOffset_u8);
+		EEPROM.write(addressTemperatureUnits_u8,temperatureUnits);
+
+		// write signed variables to EEPROM
+		EEPROM.write(addressTemperatureMin_s8,temperatureMin_s8);
+		EEPROM.write(addressTemperatureMax_s8,temperatureMax_s8);
+		EEPROM.write(addressTemperatureOffset_s8,temperatureOffset_s8);
+		EEPROM.write(addressTemperatureOffsetMin_s8,temperatureOffsetMin_s8);
+		EEPROM.write(addressTemperatureOffsetMax_s8,temperatureOffsetMax_s8);
+		EEPROM.write(addressLowTemperatureAlarmValue_s8,lowTemperatureAlarmValue_s8);
+		EEPROM.write(addressLowTemperatureAlarmMin_s8,lowTemperatureAlarmMin_s8);
+		EEPROM.write(addressLowTemperatureAlarmMax_s8,lowTemperatureAlarmMax_s8);
 		
 	}
 	
-	#ifdef _DEBUGEEPROM
+	#ifdef _DEBUG
 	Serial.println("initialize EEPROM Complete");
-	for(uint8_t k = 0; k<sizeof(userSettingEepromAddressesUnsigned); k++)
+	for(uint8_t k = 0; k<sizeof(userSettingEepromAddressesAll); k++)
 	{
 		Serial.print("EEPROM location " );
-		Serial.print(userSettingEepromAddressesUnsigned[k]);
+		Serial.print(userSettingEepromAddressesAll[k]);
 		Serial.print(" = " );
-		Serial.println(EEPROM.read(userSettingEepromAddressesUnsigned[k]));
-	}
-
-	// store signed variables in EEPROM
-	for(uint8_t l = 0; l<sizeof(userSettingEepromAddressesSigned); l++)
-	{
-		Serial.print("EEPROM location " );
-		Serial.print(userSettingEepromAddressesSigned[l]);
-		Serial.print(" = " );
-		Serial.println(EEPROM.read(userSettingEepromAddressesSigned[l]));
+		Serial.println(EEPROM.read(userSettingEepromAddressesAll[k]));
 	}
 	
 	#endif // _DEBUG
@@ -1542,7 +1614,7 @@ M2_VLIST(vlist_dateMenu_toplevel, NULL, list_dateMenu);
 // Set time menu
 //*******************
 
-M2_U8NUMFN(el_time_hour, "c2", 1,12,time_hour_fn);
+M2_U8NUM(el_time_hour, "c2", 1,12,&time_hour_u8);
 M2_U8NUM(el_time_minute, "c2", 0,59,&time_minute_u8);
 M2_U8NUMFN(el_time_second, "c2r1", 0,59,getSeconds);
 M2_BUTTONPTR(el_meriden_button,NULL, &meriden, meridenSelect_fn);
