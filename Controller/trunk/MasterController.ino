@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 // Defines
-//#define _DEBUG
+#define _DEBUG
 #define _DEBUGEEPROM
 #define blinkInterval 1000	//blink pin 13 LED every second This needs to be changed to a const uint8_t
 //#define sleepInterval 6000 //go to sleep after ten minutes of no user button press
@@ -122,7 +122,9 @@ uint8_t el_strlist_AMPMMenu_first_u8 = 0;
 uint8_t el_strlist_AMPMMenu_cnt_u8 = 1;
 
 // used to determine if it is morning or night for time function set.
-const char *meriden = "AM";
+uint8_t meriden_flg = 0; // 0 = AM, 1 = PM
+const char *meriden = "AM"; 
+
 
 // Variables used in the set open time menu
 uint8_t timeOpen_second_u8 = 0;
@@ -706,7 +708,7 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
         case 1:
           //set time
           Serial.println("set time");
-		  time_hour_u8 = hour();
+		  time_hour_u8 = hourFormat12(); 
 		  time_minute_u8 = minute();
           m2_SetRoot(&vlist_timeMenu_toplevel);
           break;
@@ -738,13 +740,6 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
   }
   return t;
 }
-
-
-
-
-
-
-
 
 
 
@@ -802,14 +797,16 @@ uint8_t time_hour_fn(m2_rom_void_p element, uint8_t msg, uint8_t val)
 // Function to handle AM/PM selection in set time menu
 void meridenSelect_fn(m2_el_fnarg_p fnarg)  {
 	// when the button is clicked the following is executed.
-	if ("AM" == meriden )
+	if (0 == meriden_flg )
 	{
 		
 		meriden = "PM";
+		meriden_flg = 1;
 	}
 	else
 	{
 		meriden = "AM";
+		meriden_flg = 0;
 	}
 	#ifdef _DEBUG
 	Serial.println(meriden);
@@ -822,16 +819,16 @@ void meridenSelect_fn(m2_el_fnarg_p fnarg)  {
 //*******************
 
 void time_ok_fn(m2_el_fnarg_p fnarg)  {
-    Serial.println("set time ok");
+	Serial.println("set time ok");
 	uint8_t temp_hour_u8;
-	if ("PM" == meriden)
+	if (1==meriden_flg)
 	{
 		temp_hour_u8 = time_hour_u8+12;
-	}	
+	}
 	else
 	{
 		temp_hour_u8 = time_hour_u8;
-	}	
+	}
 	setTime(temp_hour_u8, time_minute_u8, time_second_u8,day(),month(),year());
 	displayDate();
 	RTC.set(now());
@@ -1268,7 +1265,8 @@ uint8_t waterLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t waterLev
 
 uint8_t getTemperature_fn(m2_rom_void_p element, uint8_t msg, uint8_t temp) {
 	
-	float temperature = CT.temperatureSensor(); 
+	float temperature = CT.temperatureSensor(temperatureUnits); 
+
 	temp = round(temperature);
 	return temp;
 }
