@@ -181,7 +181,7 @@ uint8_t highTemperatureAlarmValue_u8 = 85;
 uint8_t highTemperatureAlarmMin_u8 = 0;
 uint8_t highTemperatureAlarmMax_u8 = 120;
 uint8_t humidityOffset_u8 = 0;
-uint8_t temperatureUnits = 0; // 0 = Celsius, 1 = Fahrenheit
+uint8_t temperatureUnits_u8 = 0; // 0 = Celsius, 1 = Fahrenheit
 
 
 // EEPROM support values
@@ -532,7 +532,7 @@ void loop() {
 					Serial.println("Button Pressed");
 				#endif // _DEBUG
 				m2.draw();
-				CT.displayTimer(displayTimerInterval_u8, true);
+				CT.displayTimer(displayTimerInterval_u8, true);// reset display timer
 			}
 			m2.checkKey();
 			if(CT.displayTimer(displayTimerInterval_u8, false))
@@ -544,9 +544,6 @@ void loop() {
 			}
 			
 		break;	// end user menu mode
-		
-		
-		
 		
 	case openDoorID_u8:
 
@@ -570,7 +567,7 @@ const char *el_strlist_mainMenu_getstr(uint8_t idx, uint8_t msg) {
   const char *m = "";
   if  ( idx == 0 )
   {
-    m = "Time/Date Menu";
+    m = "Time/Date";
   }
   else if ( idx == 1 )
   {
@@ -715,7 +712,7 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
         case 2:
           //"Door open time";
           Serial.println("Door open time");
-          timeOpen_second_temp_u8 = timeOpen_second_u8; // used to store current alarm values in the even the user cancels the selection
+          timeOpen_second_temp_u8 = timeOpen_second_u8; // used to store current alarm values in the event the user cancels the selection
           timeOpen_minute_temp_u8 = timeOpen_minute_u8;
           timeOpen_hour_temp_u8 = timeOpen_hour_u8;
           m2_SetRoot(&vlist_timeOpenMenu_toplevel);
@@ -723,7 +720,7 @@ const char *el_strlist_timeMenu_getstr(uint8_t idx, uint8_t msg) {
         case 3:
           //"Door close time";
           Serial.println("Door close time");
-          timeClose_second_temp_u8 = timeClose_second_u8; // used to store current alarm values in the even the user cancels the selection
+          timeClose_second_temp_u8 = timeClose_second_u8; // used to store current alarm values in the event the user cancels the selection
           timeClose_minute_temp_u8 = timeClose_minute_u8;
           timeClose_hour_temp_u8 = timeClose_hour_u8;
           m2_SetRoot(&vlist_timeCloseMenu_toplevel);
@@ -766,33 +763,6 @@ void date_cancel_fn(m2_el_fnarg_p fnarg)  {
 //***********************
 // set AM or PM depending on user selection
 //************************
-
-
-
-uint8_t time_hour_fn(m2_rom_void_p element, uint8_t msg, uint8_t val)
-{
-	#ifdef _DEBUG
-	Serial.print("Incoming VAL = ");	
-	Serial.println(val);
-	#endif
-
-	if ( msg == M2_U8_MSG_GET_VALUE )
-	{
-		if (isPM())
-		{
-			val = time_hour_u8-12;
-		} 
-		else
-		{
-			val = time_hour_u8;
-		}
-	}
-	#ifdef _DEBUG
-	Serial.print("Returning VAL = ");	
-	Serial.println(val);
-	#endif
-	return val;
-}
 
 // Function to handle AM/PM selection in set time menu
 void meridenSelect_fn(m2_el_fnarg_p fnarg)  {
@@ -850,9 +820,14 @@ void time_cancel_fn(m2_el_fnarg_p fnarg)  {
 void timeOpen_ok_fn(m2_el_fnarg_p fnarg)  {
   //Alarm.alarmRepeat(timeOpen_hour,timeOpen_minute,timeOpen_second, MorningAlarm); 
   Serial.print("Time open");
-  Serial.print(timeOpen_hour_u8);
-  Serial.print(":");
-  Serial.print(timeOpen_minute_u8);
+  EEPROM.write(addressTimeOpen_hour_u8,timeOpen_hour_u8);
+  EEPROM.write(addressTimeOpen_minute_u8,timeOpen_minute_u8);  
+  delay(100); //short delay to let EEPROM settle
+  #ifdef _DEBUG
+	  Serial.print(EEPROM.read(addressTimeOpen_hour_u8));
+	  Serial.print(":");
+	  Serial.println(EEPROM.read(addressTimeOpen_minute_u8));
+  #endif
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
@@ -872,9 +847,14 @@ void timeOpen_cancel_fn(m2_el_fnarg_p fnarg)  {
 void timeClose_ok_fn(m2_el_fnarg_p fnarg)  {
   //Alarm.alarmRepeat(timeClose_hour+12,timeClose_minute,timeClose_second, EveningAlarm); 
   Serial.print("Time Close");
-  Serial.print(timeClose_hour_u8);
-  Serial.print(":");
-  Serial.print(timeClose_minute_u8);
+  EEPROM.write(addressTimeClose_hour_u8,timeClose_hour_u8);
+  EEPROM.write(addressTimeClose_minute_u8,timeClose_minute_u8);
+  delay(100); //short delay to let EEPROM settle
+  #ifdef _DEBUG
+	  Serial.print(EEPROM.read(addressTimeClose_hour_u8));
+	  Serial.print(":");
+	  Serial.println(EEPROM.read(addressTimeClose_minute_u8));
+  #endif
   m2_SetRoot(&vlist_dateTimeMenu_toplevel);
 }
 
@@ -896,14 +876,14 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
   const char *e = "";
   if  ( idx == 0 )
   {
-	  if (1==temperatureUnits)
-	  {
-		  e = "Units = *F";
-	  }
-	  else
-	  {
-		   e = "Units = *C";
-	  }
+	if (1==temperatureUnits_u8)
+	{
+		e = "Units = *F";
+	}
+	else
+	{
+		e = "Units = *C";
+	} 
   }
   else if ( idx == 1 )
   {
@@ -927,7 +907,7 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
   }
   else if ( idx > 5 )
   {
-    if (1==temperatureUnits)
+    if (1==temperatureUnits_u8)
     {
 	    e = "Units = *F";
     }
@@ -935,6 +915,7 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
     {
 	    e = "Units = *C";
     }
+
   }
   if (msg == M2_STRLIST_MSG_SELECT) 
   {
@@ -946,16 +927,23 @@ const char *el_strlist_temperatureMenu_getstr(uint8_t idx, uint8_t msg)
       switch(idx) 
       {
         case 0:
-          if (1==temperatureUnits)
+          if (1==temperatureUnits_u8)
           {
-			temperatureUnits = 0;
+			temperatureUnits_u8 = 0;
 			Serial.println("Units = *C");
 		  }
           else
 		  {
-			 temperatureUnits = 1;
+			 temperatureUnits_u8 = 1;
 			 Serial.println("Units = *F");
 		  }
+		EEPROM.write(addressTemperatureUnits_u8, temperatureUnits_u8);
+		#ifdef _DEBUG
+		Serial.print("Temperature Units EEPROM = ");
+		Serial.println(EEPROM.read(addressTemperatureUnits_u8));
+		#endif
+		  
+		  
           break;
         case 1:
           Serial.println("Temperature Adjust");
@@ -1265,7 +1253,7 @@ uint8_t waterLevelChange_fn(m2_rom_void_p element, uint8_t msg, uint8_t waterLev
 
 uint8_t getTemperature_fn(m2_rom_void_p element, uint8_t msg, uint8_t temp) {
 	
-	float temperature = CT.temperatureSensor(temperatureUnits); 
+	float temperature = CT.temperatureSensor(temperatureUnits_u8); 
 
 	temp = round(temperature);
 	return temp;
@@ -1273,7 +1261,7 @@ uint8_t getTemperature_fn(m2_rom_void_p element, uint8_t msg, uint8_t temp) {
 
 const char *tempUnits_fn(m2_rom_void_p element)
 {
-	if (1==temperatureUnits)
+	if (1==temperatureUnits_u8)
 	{
 		static const char f[] = "*F";
 		return f;
@@ -1292,11 +1280,24 @@ const char *tempUnits_fn(m2_rom_void_p element)
 
 void goBack2Main(m2_el_fnarg_p fnarg) {
 	
+	EEPROM.write(addressFoodLevelMin_u8,foodLevelMin_u8);
+	EEPROM.write(addressFoodLevelMax_u8,foodLevelMax_u8);
+	EEPROM.write(addressGritLevelMin_u8,gritLevelMin_u8);
+	EEPROM.write(addressGritLevelMax_u8,gritLevelMax_u8);
+	EEPROM.write(addressCalciumLevelMin_u8,calciumLevelMin_u8);
+	EEPROM.write(addressCalciumLevelMax_u8,calciumLevelMax_u8);
+	EEPROM.write(addressWaterLevelMin_u8,waterLevelMin_u8);
+	EEPROM.write(addressWaterLevelMax_u8,waterLevelMax_u8);
+	
 	m2_SetRoot(&vlist_mainMenu_toplevel);
 	
 }
 
 void goBack2TempMenu(m2_el_fnarg_p fnarg) {
+	
+	
+	
+	
 	
 	m2_SetRoot(&vlist_temperatureMenu_toplevel);
 	
@@ -1348,7 +1349,7 @@ boolean initEEPROM()
 		highTemperatureAlarmMin_u8 = EEPROM.read(addressHighTemperatureAlarmMin_u8);
 		highTemperatureAlarmMax_u8 = EEPROM.read(addressHighTemperatureAlarmMax_u8);
 		humidityOffset_u8 = EEPROM.read(addressHumidityOffset_u8);
-		temperatureUnits = EEPROM.read(addressTemperatureUnits_u8);
+		temperatureUnits_u8 = EEPROM.read(addressTemperatureUnits_u8);
 
 		// read unsigned variables from EEPROM
 		temperatureMin_s8 = EEPROM.read(addressTemperatureMin_s8);
@@ -1384,7 +1385,7 @@ boolean initEEPROM()
 		EEPROM.write(addressHighTemperatureAlarmMin_u8,highTemperatureAlarmMin_u8);
 		EEPROM.write(addressHighTemperatureAlarmMax_u8,highTemperatureAlarmMax_u8);
 		EEPROM.write(addressHumidityOffset_u8,humidityOffset_u8);
-		EEPROM.write(addressTemperatureUnits_u8,temperatureUnits);
+		EEPROM.write(addressTemperatureUnits_u8,temperatureUnits_u8);
 
 		// write signed variables to EEPROM
 		EEPROM.write(addressTemperatureMin_s8,temperatureMin_s8);
@@ -1564,8 +1565,6 @@ M2_VLIST(vlist_environmentDisplay_toplevel, NULL, list_environmentUserDisplay);
 
 
 
-
-
 //****************************************************************************************
 // User Menu setup elements
 // ***************************************************************************************
@@ -1574,8 +1573,8 @@ M2_VLIST(vlist_environmentDisplay_toplevel, NULL, list_environmentUserDisplay);
 //*******************
 // Main Menu setup
 //*******************
-M2_STRLIST(el_strlist_mainMenu, "l3w15", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8, el_strlist_mainMenu_getstr);
-M2_VSB(el_strlist_mainMenu_vsb, "l3w1", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8);
+M2_STRLIST(el_strlist_mainMenu, "l3w13", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8, el_strlist_mainMenu_getstr);
+M2_VSB(el_strlist_mainMenu_vsb, "l3w0", &el_strlist_mainMenu_first_u8, &el_strlist_mainMenu_cnt_u8);
 M2_LIST(list_strlist_mainMenu) = { &el_strlist_mainMenu_vsb , &el_strlist_mainMenu };
 M2_HLIST(el_strlist_mainMenu_hlist, NULL, list_strlist_mainMenu);
 M2_LIST(list_label_strlist_mainMenu) = {&el_mainMenu_label, &el_strlist_mainMenu_hlist};
@@ -1586,7 +1585,7 @@ M2_VLIST(vlist_mainMenu_toplevel, NULL, list_label_strlist_mainMenu);
 // Time menu setup
 //*******************
 M2_STRLIST(el_strlist_timeMenu, "l3w15", &el_strlist_timeMenu_first_u8, &el_strlist_timeMenu_cnt_u8, el_strlist_timeMenu_getstr);
-M2_VSB(el_strlist_timeMenu_vsb, "l3w1", &el_strlist_timeMenu_first_u8, &el_strlist_timeMenu_cnt_u8);
+M2_VSB(el_strlist_timeMenu_vsb, "l3w0", &el_strlist_timeMenu_first_u8, &el_strlist_timeMenu_cnt_u8);
 // determines the horizontal position of the elements vs the scroll bar
 M2_LIST(list_strlist_timeMenu) = { &el_strlist_timeMenu_vsb , /*&el_space,*/ &el_strlist_timeMenu };
 M2_HLIST(el_strlist_timeMenu_hlist, NULL, list_strlist_timeMenu);
@@ -1742,7 +1741,7 @@ M2_VLIST(Vlist_waterMenu_toplevel, NULL, list_waterMenu);
 //*******************
 M2_LABEL(el_title_temperatureMenu_label, NULL,"Temperature Menu");
 M2_STRLIST(el_strlist_temperatureMenu, "l3w15", &el_strlist_temperatureMenu_first_u8, &el_strlist_temperatureMenu_cnt_u8, el_strlist_temperatureMenu_getstr);
-M2_VSB(el_strlist_temperatureMenu_vsb, "l3w1", &el_strlist_temperatureMenu_first_u8, &el_strlist_temperatureMenu_cnt_u8);
+M2_VSB(el_strlist_temperatureMenu_vsb, "l3w0", &el_strlist_temperatureMenu_first_u8, &el_strlist_temperatureMenu_cnt_u8);
 M2_LIST(list_strlist_temperatureMenu) = { &el_strlist_temperatureMenu_vsb , &el_strlist_temperatureMenu};
 M2_HLIST(el_strlist_temperatureMenu_hlist, NULL, list_strlist_temperatureMenu);
 M2_LIST(list_label_strlist_temperatureMenu) = {&el_title_temperatureMenu_label, &el_strlist_temperatureMenu_hlist};
