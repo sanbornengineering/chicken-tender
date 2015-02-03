@@ -35,7 +35,8 @@ This was becoming to much work for our low maintenance chickens. We tried a 25 w
 == Heater Installation Instructions ==
 
  # Drill a pilot hole in the side of the bucket near the top. 
- # Step up to a 1/2 inch hole. https://drive.google.com/file/d/0BwKs3fOek0BDS2V3NXdMM0R2MHM/view?usp=sharing?chs=200x125&chd=t:48.14,33.79,19.77|83.18,18.73,12.04&cht=bvg&nonsense=something_that_ends_with.png
+ # Step up to a 1/2 inch hole. 
+[https://drive.google.com/open?id=0BwKs3fOek0BDS2V3NXdMM0R2MHM&authuser=1]
  # Using a saw cut from the top of the bucket to the top of the 1/2" drilled hole.
  # Work the grommet over the electrical cord of the heater
  # Push the grommet into the 1/2" hole to seal out dirt and grime
